@@ -9,18 +9,11 @@ Preliminary code for the Bamona project with Battus philenor data
 
 ```{r}
 library(curl)
-b <- curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN588_Fall21/KamilarAndCooperData.csv")
-data <- read.csv(b, header = TRUE, sep = ",")
-data
-```
-
-
-```{r}
-library(curl)
-b <- curl("https://raw.githubusercontent.com/butterfliesrcool/Bomona_Project/main/battus_philenor.csv")
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
 battus <- read.csv(b, header = TRUE, sep = ",")
-head(battus)
+battus
 ```
+
 ```{r}
 length(battus$Longitude)
 clean.battus <- na.omit(battus)
