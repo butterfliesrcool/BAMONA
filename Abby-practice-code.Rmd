@@ -15,9 +15,14 @@ battus
 ```
 
 ```{r}
-length(battus$Longitude)
+length(battus$Record.Number)
 clean.battus <- na.omit(battus)
-length(clean.battus$Longitude)
+length(clean.battus$Record.Number)
+
+df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus.data$Record.Number)
+
 ```
 
 
@@ -27,6 +32,7 @@ battus <- st_as_sf(clean.battus, coords = c("Lat.Long", "Longitude"))
 ```
 
 ```{r}
+library(ggplot2)
 q <- ggplot() + geom_sf(data = battus, color = "light pink", alpha = 0.5) + theme_bw()
 q
 ```
