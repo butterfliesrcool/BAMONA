@@ -22,7 +22,6 @@ length(clean.battus$Record.Number)
 df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
 battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
 length(battus.data$Record.Number)
-
 ```
 
 
@@ -33,6 +32,7 @@ battus <- st_as_sf(clean.battus, coords = c("Lat.Long", "Longitude"))
 
 ```{r}
 library(ggplot2)
+library(ggmap)
 q <- ggplot() + geom_sf(data = battus, color = "light pink", alpha = 0.5) + theme_bw()
 q
 ```
@@ -52,7 +52,7 @@ Now, unfortunately, {agehabitatHR} does not yet allow for the use of {sf} object
 ```{r}
 # Create a coordinate column, with both your X and Y values:
 
-b <- curl("https://raw.githubusercontent.com/butterfliesrcool/Bomona_Project/main/battus_philenor.csv")
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
 battus <- read.csv(b, header = TRUE, sep = ",")
 clean.battus <- na.omit(battus)
 xy <- clean.battus[, c("Lat.Long", "Longitude")]
@@ -119,7 +119,7 @@ kern
 ```{r}
 # Create a coordinate column, with both your X and Y values:
 
-l <- curl("https://raw.githubusercontent.com/butterfliesrcool/Bomona_Project/main/limenitis_arthemis_astyanax.csv")
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
 lim <- read.csv(l, header = TRUE, sep = ",")
 clean.lim <- na.omit(lim)
 xy <- clean.lim[, c("Lat.Long", "Longitude")]
