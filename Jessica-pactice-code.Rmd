@@ -5,28 +5,200 @@ date: '2022-07-12'
 output: html_document
 ---
 
-Preliminary code for the Battus philenor data
+[1] Preliminary code for the Battus philenor data:
+```{r}
+install.packages("curl")
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+head(battus) #for large data sets, shows the first six data points; can also use tail() to show last six data points
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+battus$Longitude #shows all data for one column
+length(battus$Longitude) #tells you how many data points there are under Longitude column
+clean.battus <- na.omit(battus) #deletes blank data points
+length(clean.battus$Longitude) #tells you how many data points there are after deleting blanks
 ```
 
-## R Markdown
+Deleting a data subset:
+``` {r}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+battus.data <- subset(clean.battus, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+battus.data
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+Removing blank data points from "Record Number" and then removing extraneous columns, then selectively including only "Specimen" and "Photograph" under "Specimen Type" column (omitting "Sightings", which cannot be confirmed):
+```{r}
+length(battus$Record.Number)
+clean.battus <- na.omit(battus)
+length(clean.battus$Record.Number)
 
-You can also embed plots, for example:
+df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus.data$Record.Number)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+[2] Cleaning data for L. arthemis astyanax:
+``` {r}
+#Importing all L. arthemis astyanax data, then showing first six data points to verify:
+install.packages("curl")
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+
+astyanax <- read.csv(b, header = TRUE, sep = ",")
+head(astyanax)
+
+#Delete data points with missing coordinates (either "Lat/Long" or "Longitude"). Verify changes:
+astyanax$Longitude #shows all data for one column
+length(astyanax$Longitude) #tells you how many data points there are under Longitude column
+clean.astyanax <- na.omit(astyanax) #deletes blank data points
+length(clean.astyanax$Longitude) #tells you how many data points there are after deleting blanks
+
+length(astyanax$Record.Number)
+clean.astyanax <- na.omit(astyanax)
+length(clean.astyanax$Record.Number)
+
+df = subset(clean.astyanax, select = -c(Organism.Type, Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+astyanax.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(astyanax.data$Record.Number)
+
+```
+ 
+ 
+[3] Cleaning data for P. glaucus:
+``` {r}
+install.packages("curl")
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+
+glaucus <- read.csv(b, header = TRUE, sep = ",")
+head(glaucus)
+
+#Deleting blanks:
+glaucus$Longitude
+length(glaucus$Longitude)
+clean.glaucus <- na.omit(glaucus)
+length(clean.glaucus$Longitude)
+
+#Deleting blanks under "Record Number":
+length(glaucus$Record.Number)
+clean.glaucus <- na.omit(glaucus)
+length(clean.glaucus$Record.Number)
+
+#Omitting extraneous columns:
+ df = subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+ 
+#Omitting "Sightings" under "Specimen Type":
+glaucus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(glaucus.data$Record.Number)
+
+#Omitting all but "BF" under "Sex":
+glaucus.data <- subset(df, Sex %in% c("BF"), drop = FALSE)
+length(glaucus.data$Record.Number)
+
+```
+
+[4] Cleaning data for P. polyxenes:
+```{r}
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+
+polyxenes <- read.csv(b, header = TRUE, sep = ",")
+head(polyxenes)
+
+polyxenes$Longitude
+length(polyxenes$Longitude)
+clean.polyxenes <- na.omit(polyxenes)
+length(clean.polyxenes$Longitude)
+
+length(polyxenes$Record.Number)
+clean.polyxenes <- na.omit(polyxenes)
+length(clean.polyxenes$Record.Number)
+
+df = subset(clean.polyxenes, select = -c(Organism.Type, Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+polyxenes.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(polyxenes.data$Record.Number)
+
+```
+
+[5] Cleaning data for P. troilus:
+``` {r}
+install.packages("curl)
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/5cfc0a039080ff00b279a4fc15797dadb227847d/papilio_troilus.csv")
+
+troilus <- read.csv(b, header = TRUE, sep = ",")
+tail(troilus)
+
+troilus$Longitude
+length(troilus$Longitude)
+clean.troilus <- na.omit(troilus)
+length(clean.troilus$Longitude)
+
+length(troilus$Record.Number)
+clean.troilus <- na.omit(troilus)
+length(clean.troilus$Record.Number)
+
+df = subset(clean.troilus, select = -c(Organism.Type, Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+troilus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(troilus.data$Record.Number)
+
+```
+
+[6] Cleaning data for S. diana:
+```{r}
+library(curl)
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(b, header = TRUE, sep = ",")
+head(diana)
+
+#Deleting blanks:
+diana$sex
+length(diana$sex)
+clean.diana <- na.omit(diana)
+length(clean.diana$sex)
+ 
+#Omitting "Sightings" under "Specimen Type":
+diana.data <- subset(clean.diana, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(diana.data$Record.Number)
+
+#Omitting all but "F" under "Sex":
+mimics <- subset(diana.data, sex == "F", drop = FALSE)
+length(mimics$Record.Number)
+```
+
+
+[7] Practicing kernel density with L. athemis astyanax:
+```{r}
+library(adehabitatHR)
+astyanax_k100 <- kernelUD(astyanax.sp)
+image(astyanax_k100)
+
+kern99 <- getverticeshr(astyanax_k100, percent = 99)
+kern85 <- getverticeshr(astyanax_k100, percent = 85)
+
+#For some reason, I'm getting an error here with the "st_as_sf" call. But R still produces a heat map.
+kern99 <- st_as_sf(kern99)
+kern85 <- st_as_sf(kern85)
+kern <- q + geom_sf(data = kern99, color = "pink", fill = "pink", alpha = 0.3) + 
+    geom_sf(data = kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
+kern
+```
+
+
+[8] Kernel density for P. glaucus:
+```{r}
+library(adehabitatHR)
+glaucus_k100 <- kernelUD(glaucus.sp)
+image(glaucus_k100)
+
+kern99 <- getverticeshr(glaucus_k100, percent = 99)
+kern85 <- getverticeshr(glaucus_k100, percent = 85)
+
+kern99 <- st_as_sf(kern99)
+kern85 <- st_as_sf(kern85)
+kern <- q + geom_sf(data = kern99, color = "pink", fill = "pink", alpha = 0.3) + 
+    geom_sf(data = kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
+kern
+```
