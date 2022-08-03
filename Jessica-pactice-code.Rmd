@@ -202,3 +202,8 @@ kern <- q + geom_sf(data = kern99, color = "pink", fill = "pink", alpha = 0.3) +
     geom_sf(data = kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
 kern
 ```
+
+```{r}
+install.packages("rjson")
+
+```
