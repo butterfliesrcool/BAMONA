@@ -15,13 +15,48 @@ library(sp)
 library(adehabitatHR)
 ```
 
-Code to load battus data 
+Use "curl" command to load and name data files from the GitHub repo for Battus philenor and all mimics 
+
 ```{r}
+##   battus
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
 battus <- read.csv(b, header = TRUE, sep = ",")
-battus
 ```
-##write code to load data for all mimic species 
+
+```{r}
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+```
+
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+```
+
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+```
+
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+```
+
+
+
+
+
 
 
 Code to clean data here 
@@ -32,8 +67,8 @@ clean.battus <- na.omit(battus)
 length(clean.battus$Record.Number)
 
 df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(battus.data$Record.Number)
+battus <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus$Record.Number)
 ```
 
 ```{r}

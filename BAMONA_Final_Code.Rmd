@@ -4,27 +4,56 @@ author: "Abby Robinson and Jess Herrmann"
 date: "7/12/2022"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Load Package Libraries
+```{r}
+library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR)
 ```
 
-## R Markdown
+Use "curl" command to load and name data files from the GitHub repo for Battus philenor and all mimics 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+##   battus
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+battus
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+limenitis
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+glaucus
+```
+
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+polyxenes
+```
+
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+troilus
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+diana
+```
