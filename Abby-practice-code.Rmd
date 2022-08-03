@@ -53,28 +53,110 @@ d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyer
 diana <- read.csv(d, header = TRUE, sep = ",")
 ```
 
+Clean data: remove NA values, remove all data points that don't include a specimen or photograph, and remove unnecessary data columns 
 
-
-
-
-
-
-Code to clean data here 
 ```{r}
-##Battus 
+##   battus 
+
 length(battus$Record.Number)
 clean.battus <- na.omit(battus)
 length(clean.battus$Record.Number)
 
-df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-battus <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+b <- subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus <- subset(b, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
 length(battus$Record.Number)
+battus
 ```
 
 ```{r}
-##Limenitis 
+##limenitis 
 
+length(limenitis$Record.Number)
+clean.limenitis <- na.omit(limenitis)
+length(clean.limenitis$Record.Number)
+
+l <- subset(clean.limenitis, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+limenitis <- subset(l, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(limenitis$Record.Number)
+limenitis
 ```
+
+```{r}
+##   glaucus
+
+length(glaucus$Record.Number)
+clean.glaucus <- na.omit(glaucus)
+length(clean.glaucus$Record.Number)
+
+g <- subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+glaucus <- subset(g, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+##   polyxenes
+
+length(polyxenes$Record.Number)
+clean.polyxenes <- na.omit(polyxenes)
+length(clean.polyxenes$Record.Number)
+
+p <- subset(clean.polyxenes, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+polyxenes <- subset(p, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(polyxenes$Record.Number)
+polyxenes
+```
+
+```{r}
+##   troilus
+
+length(troilus$Record.Number)
+clean.troilus <- na.omit(troilus)
+length(clean.troilus$Record.Number)
+
+t <- subset(clean.troilus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+troilus <- subset(t, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(troilus$Record.Number)
+troilus
+```
+
+```{r}
+##   diana 
+
+length(diana$Record.Number)
+clean.diana <- na.omit(diana)
+length(clean.diana$Record.Number)
+
+diana <- subset(clean.diana, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+Pull out only the mimetic forms for Papilio glaucus and Speyeria diana
+
+```{r}
+##   glaucus 
+
+glaucus<- subset(glaucus, Sex == "BF", drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+## diana 
+
+diana <- subset(diana, sex == "F", drop = FALSE)
+length(mimics$Record.Number)
+diana
+```
+
+final sample sizes after data cleaning 
+- battus: 1282
+- limenitis: 1700
+- glaucus: 695
+- polyxenes: 2798
+- troilus: 1822
+- diana: 70
 
 ```{r}
 battus <- st_as_sf(clean.battus, coords = c("Lat.Long", "Longitude"))
