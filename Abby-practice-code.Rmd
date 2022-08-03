@@ -5,34 +5,82 @@ date: "7/12/2022"
 output: html_document
 ---
 
-Preliminary code for the Bamona project with Battus philenor data 
-
+Load Package Libraries
 ```{r}
 library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR)
+```
+
+Use "curl" command to load and name data files from the GitHub repo for Battus philenor and all mimics 
+
+```{r}
+##   battus
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
 battus <- read.csv(b, header = TRUE, sep = ",")
-battus
 ```
 
 ```{r}
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+```
+
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+```
+
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+```
+
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+```
+
+
+
+
+
+
+
+Code to clean data here 
+```{r}
+##Battus 
 length(battus$Record.Number)
 clean.battus <- na.omit(battus)
 length(clean.battus$Record.Number)
 
 df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(battus.data$Record.Number)
+battus <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus$Record.Number)
 ```
 
+```{r}
+##Limenitis 
+
+```
 
 ```{r}
-library(sf)
 battus <- st_as_sf(clean.battus, coords = c("Lat.Long", "Longitude"))
 ```
 
 ```{r}
-library(ggplot2)
-library(ggmap)
 q <- ggplot() + geom_sf(data = battus, color = "light pink", alpha = 0.5) + theme_bw()
 q
 ```
@@ -59,7 +107,6 @@ xy <- clean.battus[, c("Lat.Long", "Longitude")]
 
 # Create your Spatial Points dataframe:
 
-library(sp)
 battus.sp <- SpatialPointsDataFrame(coords = xy, data = clean.battus, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
 ```
 
@@ -69,7 +116,6 @@ battus.sp.sf <- st_as_sf(battus.sp)
 q <- ggplot() + geom_sf(data = battus.sp.sf, color = "light pink", alpha = 0.5) + theme_bw()
 ```
 ```{r}
-library(adehabitatHR)
 battus.mcp <- mcp(battus.sp, percent = 100)
 battus.mcp ##the range estimate here doesn't really make sense, how can i incorporate specific data about the geography of the US to better inform range estimates? 
 ```
@@ -97,7 +143,6 @@ Another way of estimating the home range is to take into account how often certa
 In this case, we can try to get a kernel density estimate of the home range. Kernel density estimates essentially plot a smoothed curve over the density of points in a given geographic area (for an excellent, intuitive visual descriptor of the process, see this resource), which allows us to create a home range based on frequency of use rather than just a presence/absence MCP. Remember: although a kernel density estimator also uses presence data, absence is also considered to be data, as the density of points is a meaningful parameter.
 
 ```{r}
-library(adehabitatHR)
 battus_k100 <- kernelUD(battus.sp)
 image(battus_k100)
 ```
@@ -126,7 +171,6 @@ xy <- clean.lim[, c("Lat.Long", "Longitude")]
 
 # Create your Spatial Points dataframe:
 
-library(sp)
 lim.sp <- SpatialPointsDataFrame(coords = xy, data = clean.lim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
 ```
 
@@ -136,7 +180,6 @@ lim.sp.sf <- st_as_sf(lim.sp)
 q <- ggplot() + geom_sf(data = lim.sp.sf, color = "light pink", alpha = 0.5) + theme_bw()
 ```
 ```{r}
-library(adehabitatHR)
 lim.mcp <- mcp(lim.sp, percent = 100)
 lim.mcp ##the range estimate here doesn't really make sense, how can i incorporate specific data about the geography of the US to better inform range estimates? 
 ```
@@ -150,7 +193,6 @@ mcp1
 ```
 
 ```{r}
-library(adehabitatHR)
 lim_k100 <- kernelUD(lim.sp)
 image(lim_k100)
 ```
