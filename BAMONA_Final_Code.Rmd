@@ -555,7 +555,332 @@ all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1
                 coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
 all.kern.20
 ```
+All KD maps for 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%:
 
+Range estimates at the 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20% confidence intervals:
+```{r}
+##  battus 
+
+battus_k100 <- kernelUD(battus.sp)
+bat.kern90 <- getverticeshr(battus_k100, percent = 90)
+bat.kern80 <- getverticeshr(battus_k100, percent = 80)
+bat.kern70 <- getverticeshr(battus_k100, percent = 70)
+bat.kern60 <- getverticeshr(battus_k100, percent = 60)
+bat.kern50 <- getverticeshr(battus_k100, percent = 50)
+bat.kern40 <- getverticeshr(battus_k100, percent = 40)
+bat.kern30 <- getverticeshr(battus_k100, percent = 30)
+bat.kern20 <- getverticeshr(battus_k100, percent = 20)
+bat.kern10 <- getverticeshr(battus_k100, percent = 10)
+
+bat.kern90 <- st_as_sf(bat.kern90)
+bat.kern80 <- st_as_sf(bat.kern80)
+bat.kern70 <- st_as_sf(bat.kern70)
+bat.kern60 <- st_as_sf(bat.kern60)
+bat.kern50 <- st_as_sf(bat.kern50)
+bat.kern40 <- st_as_sf(bat.kern40)
+bat.kern30 <- st_as_sf(bat.kern30)
+bat.kern20 <- st_as_sf(bat.kern20)
+bat.kern10 <- st_as_sf(bat.kern10)
+
+##  limenitis 
+
+limenitis_k100 <- kernelUD(limenitis.sp)
+lim.kern90 <- getverticeshr(limenitis_k100, percent = 90)
+lim.kern80 <- getverticeshr(limenitis_k100, percent = 80)
+lim.kern70 <- getverticeshr(limenitis_k100, percent = 70)
+lim.kern60 <- getverticeshr(limenitis_k100, percent = 60)
+lim.kern50 <- getverticeshr(limenitis_k100, percent = 50)
+lim.kern40 <- getverticeshr(limenitis_k100, percent = 40)
+lim.kern30 <- getverticeshr(limenitis_k100, percent = 30)
+lim.kern20 <- getverticeshr(limenitis_k100, percent = 20)
+lim.kern10 <- getverticeshr(limenitis_k100, percent = 10)
+
+lim.kern90 <- st_as_sf(lim.kern90)
+lim.kern80 <- st_as_sf(lim.kern80)
+lim.kern70 <- st_as_sf(lim.kern70)
+lim.kern60 <- st_as_sf(lim.kern60)
+lim.kern50 <- st_as_sf(lim.kern50)
+lim.kern40 <- st_as_sf(lim.kern40)
+lim.kern30 <- st_as_sf(lim.kern30)
+lim.kern20 <- st_as_sf(lim.kern20)
+lim.kern10 <- st_as_sf(lim.kern10)
+
+## glaucus
+
+glaucus_k100 <- kernelUD(glaucus.sp)
+gla.kern90 <- getverticeshr(glaucus_k100, percent = 90)
+gla.kern80 <- getverticeshr(glaucus_k100, percent = 80)
+gla.kern70 <- getverticeshr(glaucus_k100, percent = 70)
+gla.kern60 <- getverticeshr(glaucus_k100, percent = 60)
+gla.kern50 <- getverticeshr(glaucus_k100, percent = 50)
+gla.kern40 <- getverticeshr(glaucus_k100, percent = 40)
+gla.kern30 <- getverticeshr(glaucus_k100, percent = 30)
+gla.kern20 <- getverticeshr(glaucus_k100, percent = 20)
+gla.kern10 <- getverticeshr(glaucus_k100, percent = 10)
+
+gla.kern90 <- st_as_sf(gla.kern90)
+gla.kern80 <- st_as_sf(gla.kern80)
+gla.kern70 <- st_as_sf(gla.kern70)
+gla.kern60 <- st_as_sf(gla.kern60)
+gla.kern50 <- st_as_sf(gla.kern50)
+gla.kern40 <- st_as_sf(gla.kern40)
+gla.kern30 <- st_as_sf(gla.kern30)
+gla.kern20 <- st_as_sf(gla.kern20)
+gla.kern10 <- st_as_sf(gla.kern10)
+
+## polyxenes
+
+polyxenes_k100 <- kernelUD(polyxenes.sp)
+pol.kern90 <- getverticeshr(polyxenes_k100, percent = 90)
+pol.kern80 <- getverticeshr(polyxenes_k100, percent = 80)
+pol.kern70 <- getverticeshr(polyxenes_k100, percent = 70)
+pol.kern60 <- getverticeshr(polyxenes_k100, percent = 60)
+pol.kern50 <- getverticeshr(polyxenes_k100, percent = 50)
+pol.kern40 <- getverticeshr(polyxenes_k100, percent = 40)
+pol.kern30 <- getverticeshr(polyxenes_k100, percent = 30)
+pol.kern20 <- getverticeshr(polyxenes_k100, percent = 20)
+pol.kern10 <- getverticeshr(polyxenes_k100, percent = 10)
+
+pol.kern90 <- st_as_sf(pol.kern90)
+pol.kern80 <- st_as_sf(pol.kern80)
+pol.kern70 <- st_as_sf(pol.kern70)
+pol.kern60 <- st_as_sf(pol.kern60)
+pol.kern50 <- st_as_sf(pol.kern50)
+pol.kern40 <- st_as_sf(pol.kern40)
+pol.kern30 <- st_as_sf(pol.kern30)
+pol.kern20 <- st_as_sf(pol.kern20)
+pol.kern10 <- st_as_sf(pol.kern10)
+
+## troilus
+
+troilus_k100 <- kernelUD(troilus.sp)
+tro.kern90 <- getverticeshr(troilus_k100, percent = 90)
+tro.kern80 <- getverticeshr(troilus_k100, percent = 80)
+tro.kern70 <- getverticeshr(troilus_k100, percent = 70)
+tro.kern60 <- getverticeshr(troilus_k100, percent = 60)
+tro.kern50 <- getverticeshr(troilus_k100, percent = 50)
+tro.kern40 <- getverticeshr(troilus_k100, percent = 40)
+tro.kern30 <- getverticeshr(troilus_k100, percent = 30)
+tro.kern20 <- getverticeshr(troilus_k100, percent = 20)
+tro.kern10 <- getverticeshr(troilus_k100, percent = 10)
+
+tro.kern90 <- st_as_sf(tro.kern90)
+tro.kern80 <- st_as_sf(tro.kern80)
+tro.kern70 <- st_as_sf(tro.kern70)
+tro.kern60 <- st_as_sf(tro.kern60)
+tro.kern50 <- st_as_sf(tro.kern50)
+tro.kern40 <- st_as_sf(tro.kern40)
+tro.kern30 <- st_as_sf(tro.kern30)
+tro.kern20 <- st_as_sf(tro.kern20)
+tro.kern10 <- st_as_sf(tro.kern10)
+
+## diana
+
+diana_k100 <- kernelUD(diana.sp)
+dia.kern90 <- getverticeshr(diana_k100, percent = 90)
+dia.kern80 <- getverticeshr(diana_k100, percent = 80)
+dia.kern70 <- getverticeshr(diana_k100, percent = 70)
+dia.kern60 <- getverticeshr(diana_k100, percent = 60)
+dia.kern50 <- getverticeshr(diana_k100, percent = 50)
+dia.kern40 <- getverticeshr(diana_k100, percent = 40)
+dia.kern30 <- getverticeshr(diana_k100, percent = 30)
+dia.kern20 <- getverticeshr(diana_k100, percent = 20)
+dia.kern10 <- getverticeshr(diana_k100, percent = 10)
+
+dia.kern90 <- st_as_sf(dia.kern90)
+dia.kern80 <- st_as_sf(dia.kern80)
+dia.kern70 <- st_as_sf(dia.kern70)
+dia.kern60 <- st_as_sf(dia.kern60)
+dia.kern50 <- st_as_sf(dia.kern50)
+dia.kern40 <- st_as_sf(dia.kern40)
+dia.kern30 <- st_as_sf(dia.kern30)
+dia.kern20 <- st_as_sf(dia.kern20)
+dia.kern10 <- st_as_sf(dia.kern10)
+```
+
+Plot all 90% graphs together:
+```{r}
+all.kern.90 <- b + geom_sf(data = bat.kern90, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern90, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern90, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern90, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern90, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern90, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.90
+```
+
+Plot all 80% graphs together:
+```{r}
+all.kern.80 <- b + geom_sf(data = bat.kern80, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern80, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern80, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern80, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern80, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern80, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.80
+```
+
+Plot all 70% graphs together:
+```{r}
+all.kern.70 <- b + geom_sf(data = bat.kern70, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern70, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern70, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern70, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern70, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern70, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.70
+```
+
+Plot all 60% graphs together:
+```{r}
+all.kern.60 <- b + geom_sf(data = bat.kern60, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern60, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern60, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern60, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern60, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern60, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.60
+```
+
+Plot all 50% graphs together:
+```{r}
+all.kern.50 <- b + geom_sf(data = bat.kern50, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern50, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern50, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern50, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern50, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern50, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.50
+```
+
+Plot all 40% graphs together:
+```{r}
+all.kern.40 <- b + geom_sf(data = bat.kern40, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern40, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern40, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern40, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern40, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern40, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.40
+```
+
+Plot all 30% graphs together:
+```{r}
+all.kern.30 <- b + geom_sf(data = bat.kern30, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern30, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern30, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern30, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern30, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern30, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.30
+```
+
+Plot all 20% graphs together:
+```{r}
+all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern20, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.20
+```
 
 NEXT STEPS: 
 
