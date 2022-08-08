@@ -228,3 +228,546 @@ kern
 ```{r}
 install.packages("rjson")
 ```
+
+FROM FINAL CODE DOCUMENT
+---
+Load Package Libraries
+```{r}
+library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR)
+library(cowplot)
+library(googleway)
+library(ggrepel)
+library(ggspatial)
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+Use "curl" command to load and name data files from the GitHub repo for Battus philenor and all mimics 
+
+```{r}
+##   battus
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+```
+
+```{r}
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+```
+
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+```
+
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+```
+
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+```
+
+Clean data: remove NA values, remove all data points that don't include a specimen or photograph, and remove unnecessary data columns 
+
+```{r}
+##   battus 
+
+length(battus$Record.Number)
+clean.battus <- na.omit(battus)
+length(clean.battus$Record.Number)
+
+b <- subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus <- subset(b, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus$Record.Number)
+battus
+```
+
+```{r}
+##limenitis 
+
+length(limenitis$Record.Number)
+clean.limenitis <- na.omit(limenitis)
+length(clean.limenitis$Record.Number)
+
+l <- subset(clean.limenitis, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+limenitis <- subset(l, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(limenitis$Record.Number)
+limenitis
+```
+
+```{r}
+##   glaucus
+
+length(glaucus$Record.Number)
+clean.glaucus <- na.omit(glaucus)
+length(clean.glaucus$Record.Number)
+
+g <- subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+glaucus <- subset(g, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+##   polyxenes
+
+length(polyxenes$Record.Number)
+clean.polyxenes <- na.omit(polyxenes)
+length(clean.polyxenes$Record.Number)
+
+p <- subset(clean.polyxenes, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+polyxenes <- subset(p, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(polyxenes$Record.Number)
+polyxenes
+```
+
+```{r}
+##   troilus
+
+length(troilus$Record.Number)
+clean.troilus <- na.omit(troilus)
+length(clean.troilus$Record.Number)
+
+t <- subset(clean.troilus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+troilus <- subset(t, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(troilus$Record.Number)
+troilus
+```
+
+```{r}
+##   diana 
+
+length(diana$Record.Number)
+clean.diana <- na.omit(diana)
+length(clean.diana$Record.Number)
+
+diana <- subset(clean.diana, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+Pull out only the mimetic forms for Papilio glaucus and Speyeria diana
+
+```{r}
+##   glaucus 
+
+glaucus<- subset(glaucus, Sex == "BF", drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+## diana 
+
+diana <- subset(diana, sex == "F", drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+final sample sizes after data cleaning 
+- battus: 1282
+- limenitis: 1700
+- glaucus: 695
+- polyxenes: 2798
+- troilus: 1822
+- diana: 70
+
+Plotting Coordinate points for all species 
+```{r}
+bat <- st_as_sf(battus, coords = c("Longitude", "Lat.Long"))
+lim <- st_as_sf(limenitis, coords = c("Longitude", "Lat.Long"))
+gla <- st_as_sf(glaucus, coords = c("Longitude", "Lat.Long"))
+pol <- st_as_sf(polyxenes, coords = c("Longitude", "Lat.Long"))
+tro <- st_as_sf(troilus, coords = c("Longitude", "Lat.Long"))
+dia <- st_as_sf(diana, coords = c("Longitude", "Lat.Long"))
+```
+
+```{r}
+b <- ggplot() + geom_sf(data = bat, color = "light pink", alpha = 0.5) + theme_bw()
+l <- ggplot() + geom_sf(data = lim, color = "light pink", alpha = 0.5) + theme_bw()
+g <- ggplot() + geom_sf(data = gla, color = "light pink", alpha = 0.5) + theme_bw()
+p <- ggplot() + geom_sf(data = pol, color = "light pink", alpha = 0.5) + theme_bw()
+t <- ggplot() + geom_sf(data = tro, color = "light pink", alpha = 0.5) + theme_bw()
+d <- ggplot() + geom_sf(data = dia, color = "light pink", alpha = 0.5) + theme_bw()
+
+b
+l
+g
+p
+t
+d
+```
+
+Now, unfortunately, {agehabitatHR} does not yet allow for the use of {sf} objects, so  we need to convert them to a spatial points object. We can do this by reimporting the dataframe and converting it to an {sp} object rather than an {sf} object:
+
+```{r}
+## battus 
+
+# Reimport data set 
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+
+clean.battus <- na.omit(battus)
+b <- subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus <- subset(b, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- battus[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+battus.sp <- SpatialPointsDataFrame(coords = xy, data = battus, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+```{r}
+## limenitis 
+
+# Reimport data set 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+
+clean.limenitis <- na.omit(limenitis)
+l <- subset(clean.limenitis, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+limenitis <- subset(l, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- limenitis[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+limenitis.sp <- SpatialPointsDataFrame(coords = xy, data = limenitis, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+```{r}
+## glaucus
+
+# Reimport data set 
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+
+clean.glaucus <- na.omit(glaucus)
+g <- subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+glaucus <- subset(g, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+glaucus.mim<- subset(glaucus, Sex == "BF", drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- glaucus.mim[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+glaucus.sp <- SpatialPointsDataFrame(coords = xy, data = glaucus.mim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+```{r}
+## polyxenes
+
+# Reimport data set 
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+
+clean.polyxenes <- na.omit(polyxenes)
+p <- subset(clean.polyxenes, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+polyxenes <- subset(p, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- polyxenes[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+polyxenes.sp <- SpatialPointsDataFrame(coords = xy, data = polyxenes, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+```{r}
+## troilus 
+
+# Reimport data set 
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+
+clean.troilus <- na.omit(troilus)
+t <- subset(clean.troilus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+troilus <- subset(t, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- troilus[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+troilus.sp <- SpatialPointsDataFrame(coords = xy, data = troilus, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+```{r}
+## diana 
+
+# Reimport data set 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+
+clean.diana <- na.omit(diana)
+diana <- subset(clean.diana, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+diana.mim <- subset(diana, sex == "F", drop = FALSE)
+
+# Create a coordinate column, with both your X and Y values:
+xy <- diana.mim[, c("Longitude", "Lat.Long")]
+
+# Create your Spatial Points dataframe:
+
+diana.sp <- SpatialPointsDataFrame(coords = xy, data = diana.mim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+```
+
+
+Create sf from spatial point objects 
+```{r}
+battus.sp.sf <- st_as_sf(battus.sp)
+limenitis.sp.sf <- st_as_sf(limenitis.sp)
+glaucus.sp.sf <- st_as_sf(glaucus.sp)
+polyxenes.sp.sf <- st_as_sf(polyxenes.sp)
+troilus.sp.sf <- st_as_sf(troilus.sp)
+diana.sp.sf <- st_as_sf(diana.sp)
+```
+
+ggplots of spatial point data 
+```{r}
+b <- ggplot() + geom_sf(data = battus.sp.sf, color = "lightpink", alpha = 0.5) + theme_bw()
+l <- ggplot() + geom_sf(data = limenitis.sp.sf, color = "royalblue", alpha = 0.5) + theme_bw()
+g <- ggplot() + geom_sf(data = glaucus.sp.sf, color = "olivedrab", alpha = 0.5) + theme_bw()
+p <- ggplot() + geom_sf(data = polyxenes.sp.sf, color = "plum4", alpha = 0.5) + theme_bw()
+t <- ggplot() + geom_sf(data = troilus.sp.sf, color = "tan1", alpha = 0.5) + theme_bw()
+d <- ggplot() + geom_sf(data = diana.sp.sf, color = "seagreen1", alpha = 0.5) + theme_bw()
+
+b
+l
+g
+p
+t
+d
+```
+
+```{r}
+battus.mcp <- mcp(battus.sp, percent = 100)
+limenitis.mcp <- mcp(limenitis.sp, percent = 100)
+glaucus.mcp <- mcp(glaucus.sp, percent = 100)
+polyxenes.mcp <- mcp(polyxenes.sp, percent = 100)
+troilus.mcp <- mcp(troilus.sp, percent = 100)
+diana.mcp <- mcp(diana.sp, percent = 100)
+```
+
+```{r}
+# First, we'll convert our polygon into an {sf} object:
+battus.mcp <- st_as_sf(battus.mcp)
+limenitis.mcp <- st_as_sf(limenitis.mcp)
+glaucus.mcp <- st_as_sf(glaucus.mcp)
+polyxenes.mcp <- st_as_sf(polyxenes.mcp)
+troilus.mcp <- st_as_sf(troilus.mcp)
+diana.mcp <- st_as_sf(diana.mcp)
+```
+
+```{r}
+# Now, let's map it:
+mcp.b <- b + geom_sf(data = battus.mcp, color = "lightpink", fill = "lightpink", alpha = 0.3)
+mcp.l <- l + geom_sf(data = limenitis.mcp, color = "royalblue", fill = "royalblue", alpha = 0.3)
+mcp.g <- g + geom_sf(data = glaucus.mcp, color = "olivedrab", fill = "olivedrab", alpha = 0.3)
+mcp.p <- p + geom_sf(data = polyxenes.mcp, color = "plum4", fill = "plum4", alpha = 0.3)
+mcp.t <- t + geom_sf(data = troilus.mcp, color = "tan1", fill = "tan1", alpha = 0.3)
+mcp.d <- d + geom_sf(data = diana.mcp, color = "seagreen1", fill = "seagreen1", alpha = 0.3)
+
+mcp.b
+mcp.l
+mcp.g
+mcp.p
+mcp.t
+mcp.d
+```
+
+##Kernel Density Estimated Home Range
+Another way of estimating the home range is to take into account how often certain parts of the home range are used based on the density of observation points in a particular area of that range. Such density estimates assume that the observation points represent a random sample of occupation points that are not biased by observer sampling. We might be wary of this method if, for example, all our observations were on the trail system. Here, however, we do appear to have a relatively unbiased sample.
+
+In this case, we can try to get a kernel density estimate of the home range. Kernel density estimates essentially plot a smoothed curve over the density of points in a given geographic area (for an excellent, intuitive visual descriptor of the process, see this resource), which allows us to create a home range based on frequency of use rather than just a presence/absence MCP. Remember: although a kernel density estimator also uses presence data, absence is also considered to be data, as the density of points is a meaningful parameter.
+
+Range estimates at the 99% and 85% confidence interval 
+```{r}
+##  battus 
+
+battus_k100 <- kernelUD(battus.sp)
+bat.kern99 <- getverticeshr(battus_k100, percent = 99)
+bat.kern85 <- getverticeshr(battus_k100, percent = 85)
+
+bat.kern99 <- st_as_sf(bat.kern99)
+bat.kern85 <- st_as_sf(bat.kern85)
+bat.kern <- b + geom_sf(data = bat.kern99, color = "pink", fill = "pink", alpha = 0.3) + 
+    geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
+bat.kern
+```
+
+```{r}
+##  battus 
+
+battus_k100 <- kernelUD(battus.sp)
+bat.kern20 <- getverticeshr(battus_k100, percent = 20)
+
+bat.kern20 <- st_as_sf(bat.kern20)
+bat.kern <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1", alpha = 0.3)
+bat.kern
+```
+
+```{r}
+##  limenitis 
+
+limenitis_k100 <- kernelUD(limenitis.sp)
+lim.kern99 <- getverticeshr(limenitis_k100, percent = 99)
+lim.kern85 <- getverticeshr(limenitis_k100, percent = 85)
+lim.kern20 <- getverticeshr(limenitis_k100, percent = 20)
+
+lim.kern99 <- st_as_sf(lim.kern99)
+lim.kern85 <- st_as_sf(lim.kern85)
+lim.kern20 <- st_as_sf(lim.kern20)
+
+lim.kern <- l + geom_sf(data = lim.kern99, color = "navyblue", fill = "navyblue", alpha = 0.3) + 
+    geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) + 
+    geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5)
+lim.kern
+```
+
+```{r}
+##  glaucus 
+
+glaucus_k100 <- kernelUD(glaucus.sp)
+gla.kern99 <- getverticeshr(glaucus_k100, percent = 99)
+gla.kern85 <- getverticeshr(glaucus_k100, percent = 85)
+gla.kern20 <- getverticeshr(glaucus_k100, percent = 20)
+
+
+gla.kern99 <- st_as_sf(gla.kern99)
+gla.kern85 <- st_as_sf(gla.kern85)
+gla.kern20 <- st_as_sf(gla.kern20)
+
+gla.kern <- g + geom_sf(data = gla.kern99, color = "olivedrab", fill = "olivedrab", alpha = 0.1) + 
+    geom_sf(data = gla.kern85, color = "olivedrab", fill = "olivedrab", alpha = 0.3) + 
+    geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5)
+gla.kern
+```
+
+```{r}
+##  polyxxenes
+
+polyxenes_k100 <- kernelUD(polyxenes.sp)
+pol.kern99 <- getverticeshr(polyxenes_k100, percent = 99)
+pol.kern85 <- getverticeshr(polyxenes_k100, percent = 85)
+pol.kern20 <- getverticeshr(polyxenes_k100, percent = 20)
+
+
+pol.kern99 <- st_as_sf(pol.kern99)
+pol.kern85 <- st_as_sf(pol.kern85)
+pol.kern20 <- st_as_sf(pol.kern20)
+
+
+pol.kern <- p + geom_sf(data = pol.kern99, color = "plum4", fill = "plum4", alpha = 0.1) + 
+    geom_sf(data = pol.kern85, color = "plum4", fill = "plum4", alpha = 0.3) + 
+    geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5)
+pol.kern
+```
+
+```{r}
+##  troilus 
+
+troilus_k100 <- kernelUD(troilus.sp)
+tro.kern99 <- getverticeshr(troilus_k100, percent = 99)
+tro.kern85 <- getverticeshr(troilus_k100, percent = 85)
+tro.kern20 <- getverticeshr(troilus_k100, percent = 20)
+
+
+tro.kern99 <- st_as_sf(tro.kern99)
+tro.kern85 <- st_as_sf(tro.kern85)
+tro.kern20 <- st_as_sf(tro.kern20)
+
+
+tro.kern <- t + geom_sf(data = tro.kern99, color = "tan1", fill = "tan1", alpha = 0.1) + 
+    geom_sf(data = tro.kern85, color = "tan1", fill = "tan1", alpha = 0.3) + 
+    geom_sf(data = tro.kern20, color = "tan1", fill = "tan1", alpha = 0.5)
+tro.kern
+```
+
+```{r}
+##  diana 
+
+diana_k100 <- kernelUD(diana.sp)
+dia.kern99 <- getverticeshr(diana_k100, percent = 99)
+dia.kern85 <- getverticeshr(diana_k100, percent = 85)
+dia.kern20 <- getverticeshr(diana_k100, percent = 20)
+
+
+dia.kern99 <- st_as_sf(dia.kern99)
+dia.kern85 <- st_as_sf(dia.kern85)
+dia.kern20 <- st_as_sf(dia.kern20)
+
+
+dia.kern <- d + geom_sf(data = dia.kern99, color = "seagreen1", fill = "seagreen1", alpha = 0.1) + 
+    geom_sf(data = dia.kern85, color = "seagreen1", fill = "seagreen1", alpha = 0.3) + 
+    geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5)
+
+dia.kern
+```
+
+Plot all 85% graphs together 
+
+```{r}
+
+all.kern85 <- b +
+
+                geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+                geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) +
+                geom_sf(data = gla.kern85, color = "olivedrab", fill = "olivedrab", alpha = 0.3) +
+                geom_sf(data = pol.kern85, color = "plum4", fill = "plum4", alpha = 0.3) +
+                geom_sf(data = tro.kern85, color = "tan1", fill = "tan1", alpha = 0.3) +
+                geom_sf(data = dia.kern85, color = "seagreen1", fill = "seagreen1", alpha = 0.3) + 
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern85
+```
+
+```{r}
+all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern20, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.20
