@@ -7,14 +7,15 @@ output: html_document
 
 [1] Preliminary code for the Battus philenor data:
 ```{r}
+install.packages("curl")
 library(curl)
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
-battus.data <- read.csv(b, header = TRUE, sep = ",")
-head(battus.data) #for large data sets, shows the first six data points; can also use tail() to show last six data points
+battus <- read.csv(b, header = TRUE, sep = ",")
+head(battus) #for large data sets, shows the first six data points; can also use tail() to show last six data points
 
-battus.data$Longitude #shows all data for one column
-length(battus.data$Longitude) #tells you how many data points there are under Longitude column
-clean.battus <- na.omit(battus.data) #deletes blank data points
+battus$Longitude #shows all data for one column
+length(battus$Longitude) #tells you how many data points there are under Longitude column
+clean.battus <- na.omit(battus) #deletes blank data points
 length(clean.battus$Longitude) #tells you how many data points there are after deleting blanks
 ```
 
@@ -29,37 +30,38 @@ battus.data
 Removing blank data points from "Record Number" and then removing extraneous columns, then selectively including only "Specimen" and "Photograph" under "Specimen Type" column (omitting "Sightings", which cannot be confirmed):
 ```{r}
 length(battus$Record.Number)
-clean.battus <- na.omit(battus.data)
+clean.battus <- na.omit(battus)
 length(clean.battus$Record.Number)
 
 df = subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-battus <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(battus$Record.Number)
+battus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus.data$Record.Number)
 
 ```
 
 [2] Cleaning data for L. arthemis astyanax:
 ``` {r}
 #Importing all L. arthemis astyanax data, then showing first six data points to verify:
+install.packages("curl")
 library(curl)
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
 
-astyanax.data <- read.csv(b, header = TRUE, sep = ",")
-head(astyanax.data)
+astyanax <- read.csv(b, header = TRUE, sep = ",")
+head(astyanax)
 
 #Delete data points with missing coordinates (either "Lat/Long" or "Longitude"). Verify changes:
-astyanax.data$Longitude #shows all data for one column
+astyanax$Longitude #shows all data for one column
 length(astyanax$Longitude) #tells you how many data points there are under Longitude column
-clean.astyanax <- na.omit(astyanax.data) #deletes blank data points
+clean.astyanax <- na.omit(astyanax) #deletes blank data points
 length(clean.astyanax$Longitude) #tells you how many data points there are after deleting blanks
 
 length(astyanax$Record.Number)
-clean.astyanax <- na.omit(astyanax.data)
+clean.astyanax <- na.omit(astyanax)
 length(clean.astyanax$Record.Number)
 
 df = subset(clean.astyanax, select = -c(Organism.Type, Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-astyanax <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(astyanax$Record.Number)
+astyanax.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(astyanax.data$Record.Number)
 
 ```
  
@@ -70,13 +72,13 @@ install.packages("curl")
 library(curl)
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
 
-glaucus.data <- read.csv(b, header = TRUE, sep = ",")
-head(glaucus.data)
+glaucus <- read.csv(b, header = TRUE, sep = ",")
+head(glaucus)
 
 #Deleting blanks:
 glaucus$Longitude
 length(glaucus$Longitude)
-clean.glaucus <- na.omit(glaucus.data)
+clean.glaucus <- na.omit(glaucus)
 length(clean.glaucus$Longitude)
 
 #Deleting blanks under "Record Number":
@@ -88,11 +90,11 @@ length(clean.glaucus$Record.Number)
  df = subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
  
 #Omitting "Sightings" under "Specimen Type":
-glaucus <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(glaucus$Record.Number)
+glaucus.data <- subset(df, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(glaucus.data$Record.Number)
 
 #Omitting all but "BF" under "Sex":
-glaucus <- subset(df, Sex %in% c("BF"), drop = FALSE)
+glaucus.data <- subset(df, Sex %in% c("BF"), drop = FALSE)
 length(glaucus.data$Record.Number)
 
 ```
@@ -122,7 +124,7 @@ length(polyxenes.data$Record.Number)
 
 [5] Cleaning data for P. troilus:
 ``` {r}
-install.packages("curl")
+install.packages("curl)
 library(curl)
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/5cfc0a039080ff00b279a4fc15797dadb227847d/papilio_troilus.csv")
 
@@ -166,63 +168,63 @@ mimics <- subset(diana.data, sex == "F", drop = FALSE)
 length(mimics$Record.Number)
 ```
 
-
-Obtaining US map:
-
+[7] Practicing with L. athemis astyanax... Creating a coordinate column, with both X and Y values:
 ```{r}
-us <- c(left = -125, bottom = 25.75, right = -67, top = 49)
-us
-map <- get_stamenmap(us, zoom = 5, maptype = "toner-lite") %>% ggmap() 
-map
-#  Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.
-```
-
-
-[7] Practicing mapping and KDE w/ astyanax:
-
-```{r}
-# Create a coordinate column, with both your X and Y values:
-
-b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
-astyanax <- read.csv(b, header = TRUE, sep = ",")
+install.packages("curl")
+library(curl)
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+lim <- read.csv(l, header = TRUE, sep = ",")
 clean.astyanax <- na.omit(astyanax)
 xy <- clean.astyanax[, c("Lat.Long", "Longitude")]
 
-# Creating a Spatial Points dataframe:
-
+# Create your Spatial Points dataframe:
+install.packages("sp")
+library(sp)
 astyanax.sp <- SpatialPointsDataFrame(coords = xy, data = clean.astyanax, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
-
-# Range estimate
-astyanax.mcp <- mcp(astyanax.sp, percent = 100)
-astyanax.mcp
-
-# Converting polygon into an {sf} object:
-astyanax.mcp <- st_as_sf(astyanax.mcp)
 ```
 
 ```{r}
-# Mapping the data:
+install.packages("sf")
+library(sf)
+astyanax <- st_as_sf(clean.astyanax, coords = c("Lat.Long", "Longitude"))
+
 astyanax.sp.sf <- st_as_sf(astyanax.sp)
 
-q <- ggplot() + geom_sf(data = astyanax.sp.sf, color = "light pink", alpha = 0.5) + theme_bw()
+install.packages("ggplot")
+library(ggplot)
 
-#Not sure about this second map yet:
-mcp1 <- q + geom_sf(data = astyanax.mcp, color = "pink", fill = "pink", alpha = 0.3)
+q <- ggplot() + geom_sf(data = lim.sp.sf, color = "light pink", alpha = 0.5) + theme_bw()
+
+install.packages("ade4")
+library(adehabitatHR)
+lim.mcp <- mcp(lim.sp, percent = 100)
+lim.mcp ##the range estimate here doesn't really make sense, how can i incorporate specific data about the geography of the US to better inform range estimates? 
+
+# First, we'll convert our polygon into an {sf} object:
+lim.mcp <- st_as_sf(lim.mcp)
+
+# Now, let's map it:
+mcp1 <- q + geom_sf(data = lim.mcp, color = "pink", fill = "pink", alpha = 0.3) + geom_sf(data = battus.mcp, color = "blue", fill = "blue", alpha = 0.3)
 mcp1
 ```
 
-Kernel density estimate for L. arthemis astyanax:
+```{r}
+library(adehabitatHR)
+lim_k100 <- kernelUD(lim.sp)
+image(lim_k100)
+```
 
 ```{r}
-astyanax_k100 <- kernelUD(astyanax.sp)
-image(astyanax_k100)
-
-kern99 <- getverticeshr(astyanax_k100, percent = 99)
-kern85 <- getverticeshr(astyanax_k100, percent = 85)
+kern99 <- getverticeshr(lim_k100, percent = 99)
+kern85 <- getverticeshr(lim_k100, percent = 85)
 
 kern99 <- st_as_sf(kern99)
 kern85 <- st_as_sf(kern85)
 kern <- q + geom_sf(data = kern99, color = "pink", fill = "pink", alpha = 0.3) + 
     geom_sf(data = kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
 kern
+```
+
+```{r}
+install.packages("rjson")
 ```
