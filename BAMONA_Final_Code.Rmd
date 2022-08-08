@@ -502,6 +502,16 @@ dia.kern
 Plot all 85% graphs together 
 
 ```{r}
+dat=map_data("world")
+
+ggplot() + 
+  geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+         aes(x=long, y=lat, map_id=region),
+         color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+         coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+```
+
+```{r}
 
 all.kern85 <- b +
 
@@ -549,7 +559,7 @@ all.kern.20
 
 NEXT STEPS: 
 
-1. Make "all.kern" maps for  90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%
+1. Make "all.kern" maps for  90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20% 
 2. Make heat maps for species density 
 3. Figure out how to get state lines on the US map 
 4. Figure out how to analyze these population density correlations statistically 
