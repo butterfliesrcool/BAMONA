@@ -439,7 +439,7 @@ gla.kern
 ```
 
 ```{r}
-##  polyxxenes
+##  polyxenes
 
 polyxenes_k100 <- kernelUD(polyxenes.sp)
 pol.kern99 <- getverticeshr(polyxenes_k100, percent = 99)
