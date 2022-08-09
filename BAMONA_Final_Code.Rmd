@@ -555,7 +555,7 @@ all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1
                 coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
 all.kern.20
 ```
-All KD maps for 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%:
+All KD maps for 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%
 
 Range estimates at the 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20% confidence intervals:
 ```{r}
