@@ -5,6 +5,9 @@ date: "7/12/2022"
 output: html_document
 ---
 
+<<<<<<< HEAD
+Preliminary code for the Bamona project with Battus philenor data 
+=======
 Load Package Libraries
 ```{r}
 library(curl)
@@ -22,59 +25,21 @@ library(rnaturalearthdata)
 ```
 
 Use "curl" command to load and name data files from the GitHub repo for Battus philenor and all mimics 
+>>>>>>> 55c26761681a6f94113588c4d4035fdfa0f3ffd1
 
 ```{r}
-##   battus
+library(curl)
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
 battus <- read.csv(b, header = TRUE, sep = ",")
-```
-
-```{r}
-##   limenitis 
-l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
-limenitis <- read.csv(l, header = TRUE, sep = ",")
-```
-
-```{r}
-##   glaucus
-g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
-glaucus <- read.csv(g, header = TRUE, sep = ",")
-```
-
-```{r}
-##   polyxenes
-p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
-polyxenes <- read.csv(p, header = TRUE, sep = ",")
-```
-
-```{r}
-##   troilus
-t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
-troilus <- read.csv(t, header = TRUE, sep = ",")
-```
-
-```{r}
-##   diana 
-d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
-diana <- read.csv(d, header = TRUE, sep = ",")
-```
-
-Clean data: remove NA values, remove all data points that don't include a specimen or photograph, and remove unnecessary data columns 
-
-```{r}
-##   battus 
-
-length(battus$Record.Number)
-clean.battus <- na.omit(battus)
-length(clean.battus$Record.Number)
-
-b <- subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
-battus <- subset(b, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
-length(battus$Record.Number)
 battus
 ```
 
 ```{r}
+<<<<<<< HEAD
+length(battus$Longitude)
+clean.battus <- na.omit(battus)
+length(clean.battus$Longitude)
+=======
 ##limenitis 
 
 length(limenitis$Record.Number)
@@ -154,24 +119,32 @@ glaucus
 diana <- subset(diana, sex == "F", drop = FALSE)
 length(diana$Record.Number)
 diana
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
-final sample sizes after data cleaning 
-- battus: 1282
-- limenitis: 1700
-- glaucus: 695
-- polyxenes: 2798
-- troilus: 1822
-- diana: 70
 
 Plotting Coordinate points for all species 
 ```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+library(sf)
+battus <- st_as_sf(clean.battus, coords = c("Lat.Long", "Longitude"))
+=======
+bat <- st_as_sf(battus, coords = c("Lat.Long", "Longitude"))
+lim <- st_as_sf(limenitis, coords = c("Lat.Long", "Longitude"))
+gla <- st_as_sf(glaucus, coords = c("Lat.Long", "Longitude"))
+pol <- st_as_sf(polyxenes, coords = c("Lat.Long", "Longitude"))
+tro <- st_as_sf(troilus, coords = c("Lat.Long", "Longitude"))
+dia <- st_as_sf(diana, coords = c("Lat.Long", "Longitude"))
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
+=======
 bat <- st_as_sf(battus, coords = c("Longitude", "Lat.Long"))
 lim <- st_as_sf(limenitis, coords = c("Longitude", "Lat.Long"))
 gla <- st_as_sf(glaucus, coords = c("Longitude", "Lat.Long"))
 pol <- st_as_sf(polyxenes, coords = c("Longitude", "Lat.Long"))
 tro <- st_as_sf(troilus, coords = c("Longitude", "Lat.Long"))
 dia <- st_as_sf(diana, coords = c("Longitude", "Lat.Long"))
+>>>>>>> 55c26761681a6f94113588c4d4035fdfa0f3ffd1
 ```
 
 ```{r}
@@ -245,6 +218,17 @@ glaucus.mim<- subset(glaucus, Sex == "BF", drop = FALSE)
 # Create a coordinate column, with both your X and Y values:
 xy <- glaucus.mim[, c("Longitude", "Lat.Long")]
 
+<<<<<<< HEAD
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/Bomona_Project/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+clean.battus <- na.omit(battus)
+xy <- clean.battus[, c("Lat.Long", "Longitude")]
+
+# Create your Spatial Points dataframe:
+
+library(sp)
+battus.sp <- SpatialPointsDataFrame(coords = xy, data = clean.battus, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+=======
 # Create your Spatial Points dataframe:
 
 glaucus.sp <- SpatialPointsDataFrame(coords = xy, data = glaucus.mim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
@@ -267,6 +251,7 @@ xy <- polyxenes[, c("Longitude", "Lat.Long")]
 # Create your Spatial Points dataframe:
 
 polyxenes.sp <- SpatialPointsDataFrame(coords = xy, data = polyxenes, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
 ```{r}
@@ -289,6 +274,11 @@ troilus.sp <- SpatialPointsDataFrame(coords = xy, data = troilus, proj4string = 
 ```
 
 ```{r}
+<<<<<<< HEAD
+library(adehabitatHR)
+battus.mcp <- mcp(battus.sp, percent = 100)
+battus.mcp ##the range estimate here doesn't really make sense, how can i incorporate specific data about the geography of the US to better inform range estimates? 
+=======
 ## diana 
 
 # Reimport data set 
@@ -305,6 +295,7 @@ xy <- diana.mim[, c("Longitude", "Lat.Long")]
 # Create your Spatial Points dataframe:
 
 diana.sp <- SpatialPointsDataFrame(coords = xy, data = diana.mim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
 
@@ -378,8 +369,12 @@ In this case, we can try to get a kernel density estimate of the home range. Ker
 
 Range estimates at the 99% and 85% confidence interval 
 ```{r}
+<<<<<<< HEAD
+library(adehabitatHR)
+=======
 ##  battus 
 
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 battus_k100 <- kernelUD(battus.sp)
 bat.kern99 <- getverticeshr(battus_k100, percent = 99)
 bat.kern85 <- getverticeshr(battus_k100, percent = 85)
@@ -421,7 +416,16 @@ lim.kern
 ```
 
 ```{r}
+<<<<<<< HEAD
+# Create a coordinate column, with both your X and Y values:
+
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/Bomona_Project/main/limenitis_arthemis_astyanax.csv")
+lim <- read.csv(l, header = TRUE, sep = ",")
+clean.lim <- na.omit(lim)
+xy <- clean.lim[, c("Lat.Long", "Longitude")]
+=======
 ##  glaucus 
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 
 glaucus_k100 <- kernelUD(glaucus.sp)
 gla.kern99 <- getverticeshr(glaucus_k100, percent = 99)
@@ -429,6 +433,10 @@ gla.kern85 <- getverticeshr(glaucus_k100, percent = 85)
 gla.kern20 <- getverticeshr(glaucus_k100, percent = 20)
 
 
+<<<<<<< HEAD
+library(sp)
+lim.sp <- SpatialPointsDataFrame(coords = xy, data = clean.lim, proj4string = CRS("+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs"))
+=======
 gla.kern99 <- st_as_sf(gla.kern99)
 gla.kern85 <- st_as_sf(gla.kern85)
 gla.kern20 <- st_as_sf(gla.kern20)
@@ -437,11 +445,20 @@ gla.kern <- g + geom_sf(data = gla.kern99, color = "olivedrab", fill = "olivedra
     geom_sf(data = gla.kern85, color = "olivedrab", fill = "olivedrab", alpha = 0.3) + 
     geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5)
 gla.kern
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
 ```{r}
 ##  polyxxenes
 
+<<<<<<< HEAD
+q <- ggplot() + geom_sf(data = lim.sp.sf, color = "light pink", alpha = 0.5) + theme_bw()
+```
+```{r}
+library(adehabitatHR)
+lim.mcp <- mcp(lim.sp, percent = 100)
+lim.mcp ##the range estimate here doesn't really make sense, how can i incorporate specific data about the geography of the US to better inform range estimates? 
+=======
 polyxenes_k100 <- kernelUD(polyxenes.sp)
 pol.kern99 <- getverticeshr(polyxenes_k100, percent = 99)
 pol.kern85 <- getverticeshr(polyxenes_k100, percent = 85)
@@ -457,6 +474,7 @@ pol.kern <- p + geom_sf(data = pol.kern99, color = "plum4", fill = "plum4", alph
     geom_sf(data = pol.kern85, color = "plum4", fill = "plum4", alpha = 0.3) + 
     geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5)
 pol.kern
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
 ```{r}
@@ -480,6 +498,11 @@ tro.kern
 ```
 
 ```{r}
+<<<<<<< HEAD
+library(adehabitatHR)
+lim_k100 <- kernelUD(lim.sp)
+image(lim_k100)
+=======
 ##  diana 
 
 diana_k100 <- kernelUD(diana.sp)
@@ -498,6 +521,7 @@ dia.kern <- d + geom_sf(data = dia.kern99, color = "seagreen1", fill = "seagreen
     geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5)
 
 dia.kern
+>>>>>>> eb390217d7dca49989444995093c54a32626c5d9
 ```
 
 Plot all 85% graphs together 
