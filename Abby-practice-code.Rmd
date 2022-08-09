@@ -390,6 +390,7 @@ bat.kern <- b + geom_sf(data = bat.kern99, color = "pink", fill = "pink", alpha 
     geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3)
 bat.kern
 ```
+
 ```{r}
 ##  battus 
 
@@ -417,29 +418,6 @@ lim.kern <- l + geom_sf(data = lim.kern99, color = "navyblue", fill = "navyblue"
     geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) + 
     geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5)
 lim.kern
-```
-```{r}
-#### do this at 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%. might be clearer than a heat map?
-######### also figure out how to analyze this statistically 
-bat.lim.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
-              geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
-              geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
-              geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5) +
-              geom_sf(data = tro.kern20, color = "tan1", fill = "tan1", alpha = 0.5) + 
-              geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
-
-  
-                annotation_scale(location = "bl", width_hint = 0.5) +
-                annotation_north_arrow(location = "bl", which_north = "false", 
-                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
-                    style = north_arrow_fancy_orienteering) +
-                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
-  
-                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
-                    aes(x=long, y=lat, map_id=region),
-                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
-                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
-bat.lim.20
 ```
 
 ```{r}
@@ -526,7 +504,7 @@ Plot all 85% graphs together
 
 ```{r}
 
-all.kern <- b +
+all.kern85 <- b +
 
                 geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
                 geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) +
@@ -544,8 +522,46 @@ all.kern <- b +
                     aes(x=long, y=lat, map_id=region),
                     color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
                 coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
-all.kern
+all.kern85
 ```
+
+```{r}
+#### do this at 90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20%. might be clearer than a heat map?
+######### also figure out how to analyze this statistically 
+all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+              geom_sf(data = lim.kern20, color = "royalblue1", fill = "royalblue1", alpha = 0.5) +
+              geom_sf(data = gla.kern20, color = "olivedrab", fill = "olivedrab", alpha = 0.5) +
+              geom_sf(data = pol.kern20, color = "plum4", fill = "plum4", alpha = 0.5) +
+              geom_sf(data = tro.kern20, color = "tan1", fill = "tan1", alpha = 0.5) + 
+              geom_sf(data = dia.kern20, color = "seagreen1", fill = "seagreen1", alpha = 0.5) +
+
+  
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern.20
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 heat map of battus
 ```{r}
 us <- c(left = -125, bottom = 25.75, right = -67, top = 49)
