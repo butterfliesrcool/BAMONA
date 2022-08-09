@@ -11,7 +11,7 @@ library(sf)
 library(ggplot2)
 library(ggmap)
 library(sp)
-library(adehabitatHR)
+library(adehabitatHR) ##kernal density package 
 library(cowplot)
 library(googleway)
 library(ggrepel)
@@ -884,8 +884,13 @@ all.kern.20
 
 NEXT STEPS: 
 
-1. Make "all.kern" maps for  90%, 80%, 70%, 60%, 50%, 40%, 30%, and 20% 
-2. Make heat maps for species density 
-3. Figure out how to get state lines on the US map 
-4. Figure out how to analyze these population density correlations statistically 
-5. Get data from iNaturalist and rerun this code with larger, more accurate sample sizes 
+1. Make heat maps for species density 
+2.  Figure out how to analyze these population density correlations statistically 
+  - research function we can use to do this in the kernal density package 
+  - stats that can be run on heat maps to show correlation between areas of highest population density
+  - statistical analysis comparing the population density of each species according to county (this        could be a GLM or something simple, there are a lot of practice modules in Chris's webpage that        explain how to do this in great detail)
+  - summary stats on county data 
+  - we can use the cbind() function to combine all species data into one dataset. we might need to do      this to directly compare coordinate information 
+  - Function that compares coordinate points 
+3. Get data from iNaturalist and rerun this code with larger, more accurate sample sizes 
+ Figure out how to get state lines on the US map 
