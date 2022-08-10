@@ -881,6 +881,23 @@ all.kern.20 <- b + geom_sf(data = bat.kern20, color = "salmon1", fill = "salmon1
                 coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
 all.kern.20
 ```
+###Spatial Analysis
+
+```{r}
+battus <- subset(battus, select = c(Scientific.Name, Lat.Long, Longitude) )
+limenitis <- subset(limenitis, select = c(Scientific.Name, Lat.Long, Longitude) )
+glaucus <- subset(glaucus, select = c(Scientific.Name, Lat.Long, Longitude) )
+polyxenes <- subset(polyxenes, select = c(Scientific.Name, Lat.Long, Longitude) )
+troilus <- subset(troilus, select = c(Scientific.Name, Lat.Long, Longitude) )
+diana <- subset(diana, select = c(Scientific.Name, Lat.Long, Longitude) )
+
+
+all.data <- rbind(battus, limenitis, glaucus, polyxenes, troilus, diana)
+
+colnames(all.data)[2] <- "Latitude"
+
+all.data
+```
 
 NEXT STEPS: 
 
