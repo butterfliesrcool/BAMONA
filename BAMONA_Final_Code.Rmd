@@ -899,9 +899,106 @@ colnames(all.data)[2] <- "Latitude"
 all.data
 ```
 
+[5] Linking in Google Maps API key
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyC9inTkefV2ApM_f363LUmxIRRbEAdZkVw")
+```
+
+[6] Generate heat maps for all species
+```{r}
+battus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = battus, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+battus_heatmap
+```
+
+```{r}
+limenitis_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = limenitis, geom = "polygon") +
+  labs(fill="L. arthemis astyanax
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+limenitis_heatmap
+```
+
+```{r}
+glaucus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = glaucus, geom = "polygon") +
+  labs(fill="P. glaucus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+glaucus_heatmap
+```
+
+```{r}
+polyxenes_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = polyxenes, geom = "polygon") +
+  labs(fill="P. polyxenes
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+polyxenes_heatmap
+```
+
+```{r}
+troilus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = troilus, geom = "polygon") +
+  labs(fill="P. troilus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+troilus_heatmap
+```
+
+```{r}
+diana_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = diana, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+diana_heatmap
+```
+
 NEXT STEPS: 
 
-1. Make heat maps for species density 
 2.  Figure out how to analyze these population density correlations statistically 
   - research function we can use to do this in the kernal density package 
   - stats that can be run on heat maps to show correlation between areas of highest population density
