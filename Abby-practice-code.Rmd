@@ -174,14 +174,37 @@ troilus <- subset(troilus, select = c(Scientific.Name, Lat.Long, Longitude) )
 diana <- subset(diana, select = c(Scientific.Name, Lat.Long, Longitude) )
 
 
-all.data <- rbind(battus, limenitis, glaucus, polyxenes, troilus, diana)
+row.all.data <- rbind(battus, limenitis, glaucus, polyxenes, troilus, diana)
 
-colnames(all.data)[2] <- "Latitude"
+colnames(row.all.data)[2] <- "Latitude"
 
-all.data
+row.all.data
+```
+```{r}
+m <- aov(data = row.all.data, Scientific.Name ~ Longitude + Latitude) 
+summary(m)
+```
+
+```{r}
+plot(row.all.data$Longitude, row.all.data$Latitude)
+
+ggplot(row.all.data,aes(x=Longitude,y=Latitude,col=Scientific.Name))+geom_point()
+```
+
+```{r}
+col.all.data <- cbind(battus, limenitis, glaucus, polyxenes, troilus, diana)
+
+colnames(col.all.data)[2] <- "Latitude"
+
+col.all.data
 ```
 
 
+```{r}
+library(spatstat)
+
+
+```
 
 
 
@@ -225,7 +248,24 @@ p <- ggmap(map) + coord_sf(xlim = c(-76.18, -76.13), ylim = c(-0.63, -0.66),
     color = "light pink", alpha = 0.5, inherit.aes = FALSE)
 
 
+```{r}
 
+all.kern85 <- b +
+
+                geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
+                geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) + 
+                annotation_scale(location = "bl", width_hint = 0.5) +
+                annotation_north_arrow(location = "bl", which_north = "false", 
+                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
+                    style = north_arrow_fancy_orienteering) +
+                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
+  
+                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
+                    aes(x=long, y=lat, map_id=region),
+                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
+                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
+all.kern85
+```
 
 ```{r}
 ## heat map 
