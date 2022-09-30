@@ -1,0 +1,27 @@
+---
+title: "BAMONA_CODE_PRACTICE"
+author: "Abby Robinson"
+date: "7/12/2022"
+output: html_document
+---
+
+This is my markdown document to practice coding for BAMONA 
+
+```{r}
+library(adehabitatHR)
+library(DT)
+library(ggmap)
+library(lubridate)
+library(maptools)
+library(readxl)
+library(rgdal)
+library(rgeos)
+library(sf)
+library(sp)
+library(spatialEco)
+library(spdplyr)
+library(tidyverse)
+library(zoom)
+```
+
+
