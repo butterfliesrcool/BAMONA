@@ -1,0 +1,39 @@
+---
+title: "GIS.Practice"
+author: "Abby Robinson"
+date: "8/14/2022"
+output: html_document
+---
+
+Source: https://cran.r-project.org/web/packages/Guerry/vignettes/MultiSpat.html
+```{r}
+library(Guerry)       # Guerry's data
+library(sp)           # management of spatial data
+library(ade4)         # multivariate analysis
+library(adegraphics)  # graphical representation
+library(spdep)        # spatial dependency
+library(adespatial)   # multivariate spatial analysis
+```
+
+```{r}
+names(gfrance85)
+```
+
+```{r}
+data(gfrance85)
+ df           <- data.frame(gfrance85)[, 7:12]    # the 6 variables
+ france.map   <- as(gfrance85, "SpatialPolygons") # the map
+ xy           <- coordinates(gfrance85)           # spatial coordinates
+ dep.names    <- data.frame(gfrance85)[, 6]       # departement names
+ region.names <- data.frame(gfrance85)[, 5]       # region names
+ col.region   <- colors()[c(149, 254, 468, 552, 26)] # colors for region
+```
+
+```{r}
+nb <- poly2nb(gfrance85)
+lw <- nb2listw(nb, style = "W")
+```
+
+```{r}
+moran.randtest(df, lw)
+```

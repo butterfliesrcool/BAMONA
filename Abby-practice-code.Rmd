@@ -180,10 +180,6 @@ colnames(row.all.data)[2] <- "Latitude"
 
 row.all.data
 ```
-```{r}
-m <- aov(data = row.all.data, Scientific.Name ~ Longitude + Latitude) 
-summary(m)
-```
 
 ```{r}
 plot(row.all.data$Longitude, row.all.data$Latitude)
@@ -191,80 +187,183 @@ plot(row.all.data$Longitude, row.all.data$Latitude)
 ggplot(row.all.data,aes(x=Longitude,y=Latitude,col=Scientific.Name))+geom_point()
 ```
 
-```{r}
-col.all.data <- cbind(battus, limenitis, glaucus, polyxenes, troilus, diana)
-
-colnames(col.all.data)[2] <- "Latitude"
-
-col.all.data
-```
 
 
 ```{r}
 library(spatstat)
-
-
 ```
 
+[5] Linking in Google Maps API key
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "")
+```
 
+[6] Generate heat maps for all species
+```{r}
+battus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = battus, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
 
-
-
-
-Notes for Google API code: 
-
-
-# Google is weird in that their 'bounding box' (coordinates that set the
-# boundary of the image we download) is in a fixed coordinate system, so we
-# need to define a function to fix the 'bounding box' to be in our actual
-# data projection of EPSG:32718:
-ggmap_bbox <- function(map) {
-    if (!inherits(map, "ggmap")) 
-        stop("map must be a ggmap object")
-    # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector,
-    # and set the names to what sf::st_bbox expects:
-    map_bbox <- setNames(unlist(attr(map, "bb")), c("ymin", "xmin", "ymax", 
-        "xmax"))
-    
-    # Coonvert the bbox to an sf polygon, transform it to 32718, and convert
-    # back to a bbox (convoluted, but it works)
-    bbox_32718 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 
-        32718))
-    
-    # Overwrite the bbox of the ggmap object with the transformed coordinates
-    attr(map, "bb")$ll.lat <- bbox_32718["ymin"]
-    attr(map, "bb")$ll.lon <- bbox_32718["xmin"]
-    attr(map, "bb")$ur.lat <- bbox_32718["ymax"]
-    attr(map, "bb")$ur.lon <- bbox_32718["xmax"]
-    map
-}
-
-# Use the function to change the coordinate system of the bounding box:
-map <- ggmap_bbox(map)
-
-p <- ggmap(map) + coord_sf(xlim = c(-76.18, -76.13), ylim = c(-0.63, -0.66), 
-    crs = st_crs(32718)) + geom_sf(data = tbs_trails, inherit.aes = FALSE) + 
-    geom_sf(data = tbs_rio, color = "dodgerblue", inherit.aes = FALSE) + geom_sf(data = d, 
-    color = "light pink", alpha = 0.5, inherit.aes = FALSE)
-
+battus_heatmap
+```
 
 ```{r}
+limenitis_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = limenitis, geom = "polygon") +
+  labs(fill="L. arthemis astyanax
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
 
-all.kern85 <- b +
+limenitis_heatmap
+```
 
-                geom_sf(data = bat.kern85, color = "salmon1", fill = "salmon1", alpha = 0.3) + 
-                geom_sf(data = lim.kern85, color = "royalblue1", fill = "royalblue1", alpha = 0.3) + 
-                annotation_scale(location = "bl", width_hint = 0.5) +
-                annotation_north_arrow(location = "bl", which_north = "false", 
-                    pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"),
-                    style = north_arrow_fancy_orienteering) +
-                coord_sf(xlim = c(-130, -70), ylim = c(25, 50)) +    
-  
-                geom_map(data=dat[dat$region=="USA",], map=dat[dat$region=="USA",],
-                    aes(x=long, y=lat, map_id=region),
-                    color="white", fill="#7f7f7f", size=0.05, alpha=1/4) +
-                coord_sf(xlim = c(-120, -70), ylim = c(25, 50)) 
-all.kern85
+```{r}
+glaucus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = glaucus, geom = "polygon") +
+  labs(fill="P. glaucus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+glaucus_heatmap
+```
+
+```{r}
+polyxenes_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = polyxenes, geom = "polygon") +
+  labs(fill="P. polyxenes
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+polyxenes_heatmap
+```
+
+```{r}
+troilus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = troilus, geom = "polygon") +
+  labs(fill="P. troilus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+troilus_heatmap
+```
+
+```{r}
+diana_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = diana, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+diana_heatmap
+```
+[1] Load package libraries
+```{r}
+library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR) ##kernel density package 
+library(cowplot)
+library(googleway)
+library(ggrepel)
+library(ggspatial)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library("tidyverse")
+library("maps")
+library("mapproj") #using this to create a projection using a coordinate system (map will appear curved, reflective of the Earth's curvature)
+library("magrittr")
+library("ggplot2")
+library(raster)
+library(rgdal)
+library(spatialEco)
+library(Spatial)
+library(raster)
+```
+
+[7] Make a raster from ggplot image/heatmap
+```{r}
+# You may need to remove the margins from the plot (i.e., keep the earth raster and the routes only)
+plot <- battus_heatmap+ 
+  theme(    
+        axis.ticks=element_blank(), 
+        axis.text.x=element_blank(), 
+        axis.text.y=element_blank(), 
+        axis.title.x=element_blank(), 
+        axis.title.y=element_blank(),
+        plot.margin = unit(c(0, 0, 0, 0), "null"),
+        legend.position = 'none'
+       ) +
+       labs(x=NULL, y=NULL)
+
+# Save the plot
+ggsave(plot=plot, "battus_heatmap.tiff", device = "tiff")
+
+# Create a StackedRaster object from the saved plot
+battus_raster <- raster("battus_heatmap.tiff") # OR stack("my_ggplot.tiff") for colored images
+
+# Get the GeoSpatial Components
+bat_lat_long <- ggplot_build(plot)$layout$panel_params[[1]][c("x.range","y.range")] 
+
+# Supply GeoSpatial  data to the StackedRaster 
+extent(battus_raster) <- c(bat_lat_long$x.range,bat_lat_long$y.range)
+projection(battus_raster) <- CRS("+proj=longlat +datum=WGS84")
+
+battus_raster
+plot(battus_raster)
+```
+
+[8] Find Pearson's correlation coefficient between two rasters - I have not worked this out yet. Here is a sample script I pulled from Stack Exchange. (It just makes a raster of the R logo.)
+```{r}
+b <- brick(system.file("external/rlogo.grd", package="raster"))
+x <- b[[1]]
+y <- b[[3]]
+r.cor <- rasterCorrelation(x, y, s = 5, type = "pearson") # you can also use Spearman correlation
+
+#This plots the raster. Not sure how to get it to show me Pearson's correlation coefficient...
+#plot(r.cor)
+
+r.cor
+```
+
+[9] Other option: raster modified t-test (another fxn in the SpatialEco package)
+```{r}
+raster.modified.ttest()
 ```
 
 ```{r}
@@ -272,3 +371,7 @@ all.kern85
 battus_k100 <- kernelUD(battus.sp)
 image(battus_k100)
 ```
+
+NOTES: 
+* Pearson's correlation coefficient in SpatialEco Package 
+* make heat map that does not include google map 
