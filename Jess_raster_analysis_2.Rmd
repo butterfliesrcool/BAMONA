@@ -1,0 +1,165 @@
+---
+title: "Jess_raster_analysis_2"
+author: "Jessica Herrmann"
+date: "2022-10-05"
+output: html_document
+---
+[1] Load libraries
+```{r}
+library(MASS)
+library(curl)
+library(raster)
+library(spatialEco)
+```
+
+[2] Create a function that can be called to load each data set
+```{r}
+load_data <- function(url){
+  
+  d <- curl(url)
+  d.csv <- read.csv(d, header = TRUE, sep = ",")
+  
+  d.clean <- na.omit(d.csv)
+  d.clean <- subset(d.clean, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+  d.clean <- subset(d.clean, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+  
+  return(d.clean)
+  
+}
+```
+
+[3]Loading the data for each species
+```{r}
+battus <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+limenitis <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+polyxenes <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+troilus <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+gla <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+
+# Have to modify it a little for the S. diana data set:
+dia <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+dia <- read.csv(dia, header = TRUE, sep = ",")
+dia <- na.omit(dia)
+dia <- subset(dia, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+```
+
+[4] Additional cleaning for P. glaucus data
+```{r}
+glaucus <- subset(gla, Sex == "BF", drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+[5] Additional cleaning for S. diana data
+```{r}
+diana <- subset(dia, sex == "F", drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+[6]
+```{r}
+butterfly_heatmap <- function(data, num_cells, extent){
+  interp <- kde2d(data$Longitude, data$Lat.Long, n=num_cells, lims=extent)
+  rast <- raster(interp)
+  rast[rast < 0.001] <- NA # This removes "noisy" low values in our rasters. We will need to determine the lower threshold optimal for our stats analysis, but for now it is set to 0.001. However, lowering this value increases our Pearson correlation coefficient.
+  return(rast)
+  
+} 
+
+conus_extent <- c(-172.54, -47.74, 23.81, 86.46) # coordinate boundaries for continental US, as a vector
+x <- 100 # number of raster tiles/pixels per raster. We will need to determine the optimal number of pixels to use here.
+
+```
+
+[7] Produce heat maps for each species
+```{r}
+battus_heat <- butterfly_heatmap(battus, n=x, conus_extent)
+limenitis_heat <- butterfly_heatmap(limenitis, n=x, conus_extent)
+polyxenes_heat <- butterfly_heatmap(polyxenes, n=x, conus_extent)
+troilus_heat <- butterfly_heatmap(troilus, n=x, conus_extent)
+glaucus_heat <- butterfly_heatmap(glaucus, n=x, conus_extent)
+diana_heat <- butterfly_heatmap(diana, n=x, conus_extent)
+```
+
+[8] Generate a raster that represents Pearson's correlation coefficient between each pixel in Battus vs. each mimic
+```{r}
+
+# We can also play around with the s-value argument. This is the size of the moving window used to determine correlation. The smaller the window, the higher the resolution. For now, it is arbitrarily set to 5.
+
+r.cor_lim <- rasterCorrelation(battus_heat, limenitis_heat, s = 5, type = "pearson")
+plot(r.cor_lim)
+
+r.cor_pol <- rasterCorrelation(battus_heat, polyxenes_heat, s = 5, type = "pearson")
+plot(r.cor_pol)
+
+r.cor_tro <- rasterCorrelation(battus_heat, troilus_heat, s = 5, type = "pearson")
+plot(r.cor_tro)
+
+r.cor_gla <- rasterCorrelation(battus_heat, glaucus_heat, s = 5, type = "pearson")
+plot(r.cor_gla)
+
+r.cor_dia <- rasterCorrelation(battus_heat, diana_heat, s = 5, type = "pearson")
+plot(r.cor_dia)
+```
+
+[9] Find Pearson's correlation coefficient for each mimetic species vs. Battus using the layerStats function (numerical value) - need to check what exactly this does (I'm assuming it's an average of the correlation coefficients?)
+```{r}
+pearson.bat_lim <- stack(battus_heat, limenitis_heat) # Can stack more than two rasters here
+layerStats(pearson.bat_lim, 'pearson', na.rm=TRUE) # The "na.rm" argument removes those very low raster values from before. Will have to decide what we want to be interpreted as "NA".
+
+# Appears inversely correlated...
+pearson.bat_pol <- stack(battus_heat, polyxenes_heat)
+layerStats(pearson.bat_pol, 'pearson', na.rm=TRUE)
+
+pearson.bat_tro <- stack(battus_heat, troilus_heat)
+layerStats(pearson.bat_tro, 'pearson', na.rm=TRUE)
+
+# Second-highest correlation coefficient:
+pearson.bat_gla <- stack(battus_heat, glaucus_heat)
+layerStats(pearson.bat_gla, 'pearson', na.rm=TRUE)
+
+# Highest correlation coefficient:
+pearson.bat_dia <- stack(battus_heat, diana_heat)
+layerStats(pearson.bat_dia, 'pearson', na.rm=TRUE)
+```
+
+[10]
+```{r}
+# I chose not to repeat the battus-limenitis comparison here.
+
+pearson.lim_pol <- stack(limenitis_heat, polyxenes_heat)
+layerStats(pearson.bat_lim, 'pearson', na.rm=TRUE)
+
+pearson.lim_tro <- stack(limenitis_heat, troilus_heat)
+layerStats(pearson.bat_tro, 'pearson', na.rm=TRUE)
+
+# Second-strongest correlation
+pearson.lim_gla <- stack(limenitis_heat, glaucus_heat)
+layerStats(pearson.bat_gla, 'pearson', na.rm=TRUE)
+
+# Strongest correlation
+pearson.lim_dia <- stack(limenitis_heat, diana_heat)
+layerStats(pearson.bat_dia, 'pearson', na.rm=TRUE)
+```
+
+
+
+
+[11] Applying the layerStats function to all rasters
+```{r}
+pearson.bat_vs_all <- stack(battus_heat,limenitis_heat, polyxenes_heat, troilus_heat,glaucus_heat, diana_heat)
+layerStats(pearson.bat_vs_all, 'pearson', na.rm=TRUE)
+```
+
+[12] Now we just have to obtain p-values for each of these correlation coefficients. I believe we will want to use the corLocal() function under the Raster package
+```{r}
+x <- battus_heat
+y <- limenitis_heat
+
+cor.local_bat_lim <- corLocal(x, y, test = TRUE ) # Not sure if we want to play w/ ngb (neighborhood size argument, like our moving window dimensions).
+plot(x)
+
+
+layerStats(cor.local_bat_lim, 'pearson', na.rm = TRUE)
+```
