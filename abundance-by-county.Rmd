@@ -18,169 +18,270 @@ library(ggrepel)
 library(ggspatial)
 library(rnaturalearth)
 library(rnaturalearthdata)
+library(lubridate)
 ```
 
 iNaturalist data 
 ```{r}
+### battus 
 b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_battus_philenor_for_r.csv")
-iNat.battus <- read.csv(b, header = TRUE, sep = ",")
-head(iNat.battus)
-```
-```{r}
-##   battus 
-length(iNat.battus$id)
+battus <- read.csv(b, header = TRUE, sep = ",")
+head(battus)
 
+length(battus$id) ### Sample size: 34,893
 b <- subset(iNat.battus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
 head(b)
-
 battus <- na.omit(b)
-length(battus$id)
-
-```
-
-
-```{r}
-nat.bat <- st_as_sf(battus, coords = c("longitude", "latitude"))
-battus <- ggplot() + geom_sf(data = nat.bat, color = "light pink", alpha = 0.5) + theme_bw()
-battus
-```
-
-
-```{r}
-library("rstudioapi")
-library("ggmap")
-register_google(key = "")
+length(battus$id) ### New sample size: 34,795
 ```
 
 ```{r}
-b <- subset(iNat.battus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
-head(b)
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+head(limenitis)
 
-battus <- na.omit(b)
+length(limenitis$id) ### Sample Size: 20,908
+l <- subset(limenitis, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(l)
+limenitis <- na.omit(l)
+length(limenitis$id) ###New Sample Size:20,855
+```
 
-iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
-                                  zoom = 4,scale = 2,
-                                  maptype = 'terrain',
-                                  color = 'color')) +
-  
-  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
-                 alpha = 0.2,
-                 bins = 100, data = battus, geom = "polygon") +
-  
-  labs(fill="B. philenor Population Density") +
-  scale_fill_viridis_c(option = "plasma")
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+head(polyxenes)
 
-## Need to figure out how to italicize species names
+length(polyxenes$id) ### Sample Size: 58,735
+p <- subset(polyxenes, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(p)
+polyxenes <- na.omit(p)
+length(polyxenes$id) ###New Sample Size: 58,563
+```
 
-#Removing Google Maps ticks and labels??
-theme(axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      axis.ticks = element_blank(),
-      axis.title.y = element_blank(),
-      axis.title.x = element_blank())
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+head(troilus)
 
-iNat_battus_heatmap ##pull out just the summer months 
+length(troilus$id) ### Sample Size: 25,174
+t <- subset(troilus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(t)
+troilus <- na.omit(t)
+length(troilus$id) ###New Sample Size: 25,077
+```
+
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_glaucus%20(version%201).xlsb.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+head(glaucus)
+
+length(glaucus$id) ### Sample Size: 66,657
+g <- subset(glaucus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name, morph) )
+head(g)
+glaucus <- na.omit(g)
+length(glaucus$id) ###New Sample Size: 64,713
+
+###### Separate only mimetic morphs 
+glaucus <- subset(glaucus, morph == "black", drop = FALSE)
+length(glaucus$id) ###Final Sample Size: 15,988
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_speyeria_diana_edited%20-%20Sheet1.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+head(diana)
+
+length(diana$id) ### Sample Size: 657
+d <- subset(diana, select = c(id, sex, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(d)
+
+diana <- na.omit(d)
+length(diana$id) ###New Sample Size: 651
+
+###### Separate only mimetic morphs 
+diana <- subset(diana, sex == "f", drop = FALSE)
+length(diana$id) ###Final Sample Size: 186
 ```
 
 ## use lubricate package to create column with just months from the dates 
 ```{r}
-b <- subset(iNat.battus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
-head(b)
-
-battus <- na.omit(b)
-length(battus$id)
-
-library(lubridate)
-dates <- parse_date_time(battus$observed_on, "ymd")
-length(dates)
-months <- months(dates)
-length(months)
-
-battus$months <- months
-battus
+b.dates <- parse_date_time(battus$observed_on, "ymd")
+b.months <- months(b.dates)
+battus$months <- b.months
+battus.summer <- subset(battus, months %in% c( "June", "July", "August"), drop = FALSE)
+length(battus.summer$id) ### Sample Size: 13,939
 ```
 
 ```{r}
-summer <- subset(battus, months %in% c( "June", "July", "August"), drop = FALSE)
-
-iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
-                                  zoom = 4,scale = 2,
-                                  maptype = 'terrain',
-                                  color = 'color')) +
-  
-  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
-                 alpha = 0.2,
-                 bins = 50, data = summer, geom = "polygon") +
-  
-  labs(fill="B. philenor Population Density in Summer Months") +
-  scale_fill_viridis_c(option = "plasma")
-
-## Need to figure out how to italicize species names
-
-#Removing Google Maps ticks and labels??
-theme(axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      axis.ticks = element_blank(),
-      axis.title.y = element_blank(),
-      axis.title.x = element_blank())
-
-iNat_battus_heatmap ##pull out just the summer months 
+l.dates <- parse_date_time(limenitis$observed_on, "ymd")
+l.months <- months(l.dates)
+limenitis$months <- l.months
+limenitis.summer <- subset(limenitis, months %in% c( "June", "July", "August"), drop = FALSE)
+length(limenitis.summer$id) ### Sample Size: 13,787
 ```
-```{r}
-peaks.by.month <- aggregate(x= battus$scientific_name, by= list(battus$months), FUN=length)
-peaks.by.month
 
-months <- peaks.by.month$Group.1
-length(months)
-sightings <- peaks.by.month$x
-length(sightings)
-abundance <- data.frame(months, sightings)
+```{r}
+p.dates <- parse_date_time(polyxenes$observed_on, "ymd")
+p.months <- months(p.dates)
+polyxenes$months <- p.months
+polyxenes.summer <- subset(polyxenes, months %in% c( "June", "July", "August"), drop = FALSE)
+length(polyxenes.summer$id) ### Sample Size: 36,226
+```
+
+```{r}
+t.dates <- parse_date_time(troilus$observed_on, "ymd")
+t.months <- months(t.dates)
+troilus$months <- t.months
+troilus.summer <- subset(troilus, months %in% c( "June", "July", "August"), drop = FALSE)
+length(troilus.summer$id) ### Sample Size: 18,617
+```
+
+```{r}
+g.dates <- parse_date_time(glaucus$observed_on, "mdy")
+g.months <- months(g.dates)
+glaucus$months <- g.months
+glaucus.summer <- subset(glaucus, months %in% c( "June", "July", "August"), drop = FALSE)
+length(glaucus.summer$id) ### Sample Size: 11,650
+```
+
+```{r}
+d.dates <- parse_date_time(diana$observed_on, "ymd")
+d.months <- months(d.dates)
+diana$months <- d.months
+diana.summer <- subset(diana, months %in% c( "June", "July", "August"), drop = FALSE)
+length(diana.summer$id) ### Sample Size: 104
+```
+
+```{r}
+new.glau <- subset(glaucus.summer, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name, months) )
+
+new.dia <- subset(diana.summer, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name, months) )
+
+iNat.data <- rbind(battus.summer, limenitis.summer, polyxenes.summer, troilus.summer, new.glau, new.dia)
+```
+
+```{r}
+abundance <- aggregate(x= iNat.data$scientific_name, by= list(iNat.data$place_state_name, iNat.data$place_county_name, iNat.data$scientific_name), FUN=length)
+abundance #### there are 2,557 "zones" of comparison across the mimicry complex 
+
+abundance$Location <- paste(abundance$Group.2, abundance$Group.1, sep = ", ")
+
+abundance <- abundance[order(abundance$Location),]
+
+abundance$Species <- abundance$Group.3
+abundance$Sightings <- abundance$x
+
+abundance <- subset(abundance, select = c(Location, Species, Sightings) )
 abundance
+```
+###Figure out how to summarize sightings of each species by county and state (maybe need to combine county and state column?)
+```{r}
+battus.abundance <- aggregate(x= battus.summer$scientific_name, by= list(battus.summer$place_state_name, battus.summer$place_county_name), FUN=length)
 
-b <- ggplot(abundance, aes(x=months, y=sightings)) 
-b <- b + geom_bar(stat="identity", color="black",fill="grey")
-#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+battus.abundance$Location <- paste(battus.abundance$Group.2, battus.abundance$Group.1, sep = ", ")
 
-b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
-b
+battus.abundance$Battus <- battus.abundance$x
+
+bat <- subset(battus.abundance, select = c(Location, Battus) )
+bat <- bat[order(bat$Battus,decreasing=T),]
+bat
 ```
 ```{r}
-northern.range <- subset(battus, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
-length(northern.range$id)
+limenitis.abundance <- aggregate(x= limenitis.summer$scientific_name, by= list(limenitis.summer$place_state_name, limenitis.summer$place_county_name), FUN=length)
 
-peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+limenitis.abundance$Location <- paste(limenitis.abundance$Group.2, limenitis.abundance$Group.1, sep = ", ")
 
-months <- peaks.by.month.north$Group.1
-length(months)
-sightings <- peaks.by.month.north$x
-length(sightings)
-abundance <- data.frame(months, sightings)
-abundance
+limenitis.abundance$Limenitis <- limenitis.abundance$x
 
-b <- ggplot(abundance, aes(x=months, y=sightings)) 
-b <- b + geom_bar(stat="identity", color="black",fill="grey")
-#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
-
-b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
-b
-#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+lim <- subset(limenitis.abundance, select = c(Location, Limenitis) )
+lim <- lim[order(lim$Limenitis,decreasing=T),]
+lim
 ```
+```{r}
+polyxenes.abundance <- aggregate(x= polyxenes.summer$scientific_name, by= list(polyxenes.summer$place_state_name, polyxenes.summer$place_county_name), FUN=length)
+
+polyxenes.abundance$Location <- paste(polyxenes.abundance$Group.2, polyxenes.abundance$Group.1, sep = ", ")
+
+polyxenes.abundance$Polyxenes <- polyxenes.abundance$x
+
+pol <- subset(polyxenes.abundance, select = c(Location, Polyxenes) )
+pol <- pol[order(pol$Polyxenes,decreasing=T),]
+pol
+```
+```{r}
+troilus.abundance <- aggregate(x= troilus.summer$scientific_name, by= list(troilus.summer$place_state_name, troilus.summer$place_county_name), FUN=length)
+
+troilus.abundance$Location <- paste(troilus.abundance$Group.2, troilus.abundance$Group.1, sep = ", ")
+
+troilus.abundance$Troilus <- troilus.abundance$x
+
+tro <- subset(troilus.abundance, select = c(Location, Troilus) )
+tro <- tro[order(tro$Troilus,decreasing=T),]
+tro
+```
+```{r}
+glaucus.abundance <- aggregate(x= new.glau$scientific_name, by= list(new.glau$place_state_name, new.glau$place_county_name), FUN=length)
+
+glaucus.abundance$Location <- paste(glaucus.abundance$Group.2, glaucus.abundance$Group.1, sep = ", ")
+
+glaucus.abundance$Glaucus <- glaucus.abundance$x
+
+gla <- subset(glaucus.abundance, select = c(Location, Glaucus) )
+gla <- gla[order(gla$Glaucus,decreasing=T),]
+gla
+```
+```{r}
+diana.abundance <- aggregate(x= new.dia$scientific_name, by= list(new.dia$place_state_name, new.dia$place_county_name), FUN=length)
+
+diana.abundance$Location <- paste(diana.abundance$Group.2, diana.abundance$Group.1, sep = ", ")
+
+diana.abundance$Diana <- diana.abundance$x
+
+dia <- subset(diana.abundance, select = c(Location, Diana) )
+dia <- dia[order(dia$Diana,decreasing=T),]
+dia
+```
+```{r}
+###merge is designed to work with two dataframes 
+bl <- merge(bat, lim, all=TRUE)
+pt <- merge(pol, tro, all=TRUE)
+blpt <- merge(bl, pt, all=TRUE)
+dg <- merge(dia, gla, all=TRUE)
+all <- merge(blpt, dg, all=TRUE)
+all
+```
+
+
+## Order Code: limenitis.abundance <- limenitis.abundance[order(limenitis.abundance$x,decreasing=T),]
+
+Next Steps: 
+#get the number of sightings of each species in each county
+#use GIS to calculate the area (m^2) of each county 
+#use number of sightings and area (m^2) to calculate abundance in each county (# individuals & species / 1m^2)
 
 ```{r}
-abundance <- aggregate(x= battus$scientific_name, by= list(battus$place_state_name, battus$place_county_name), FUN=length)
-abundance #abundance by county and state... divides battus data into 1,427 different "zones" 
-abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+c <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/county_area_data.csv")
+county_area <- read.csv(c, header = TRUE, sep = ",")
+head(county_area)
 ```
-
 ```{r}
-set.seed(2)
-n <- 50
-df <- data.frame(x = battus$longitude, y = battus$latitude)
-head(df)
+county_area$Location <- paste(county_area$name, county_area$state, sep = ", ")
+head(county_area)
 
-df <- within(battus, {
-  grp.x = cut(battus$longitude, (0:3)/3, labels = FALSE)
-  grp.y = cut(battus$latitude, (0:3)/3, labels = FALSE)
-})
-head(df)
+county.area <- subset(county_area, select = c(Location, area_2010_square_km) )
+
+abundance_and_area <- merge(all, county.area, all=FALSE)
+abundance_and_area
+#### Land Area Data Source: https://www.openintro.org/data/?data=county_complete
 ```
+
+NEXT STEPS: 
+#divide all sighting numbers by area to get the frequency of sightings per square km
+#divide sighting record for each species by the most observed species (most abundant) in that county to get relative abundance (instead of absolute abundance)
+

@@ -375,3 +375,123 @@ image(battus_k100)
 NOTES: 
 * Pearson's correlation coefficient in SpatialEco Package 
 * make heat map that does not include google map 
+
+```{r}
+
+iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="B. philenor Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_battus_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= battus$scientific_name, by= list(battus$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+b <- ggplot(abundance, aes(x=months, y=sightings)) 
+b <- b + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+b
+```
+```{r}
+northern.range <- subset(battus, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+b <- ggplot(abundance, aes(x=months, y=sightings)) 
+b <- b + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+b
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= battus$scientific_name, by= list(battus$place_state_name, battus$place_county_name), FUN=length)
+abundance #abundance by county and state... divides battus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = battus$longitude, y = battus$latitude)
+head(df)
+
+df <- within(battus, {
+  grp.x = cut(battus$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(battus$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "")
+```
+
+```{r}
+b <- subset(iNat.battus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+battus <- na.omit(b)
+
+iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = battus, geom = "polygon") +
+  
+  labs(fill="B. philenor Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_battus_heatmap ##pull out just the summer months 
+```
