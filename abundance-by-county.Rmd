@@ -178,9 +178,9 @@ abundance$Species <- abundance$Group.3
 abundance$Sightings <- abundance$x
 
 abundance <- subset(abundance, select = c(Location, Species, Sightings) )
-abundance
+head(abundance)
 ```
-###Figure out how to summarize sightings of each species by county and state (maybe need to combine county and state column?)
+
 ```{r}
 battus.abundance <- aggregate(x= battus.summer$scientific_name, by= list(battus.summer$place_state_name, battus.summer$place_county_name), FUN=length)
 
@@ -190,8 +190,9 @@ battus.abundance$Battus <- battus.abundance$x
 
 bat <- subset(battus.abundance, select = c(Location, Battus) )
 bat <- bat[order(bat$Battus,decreasing=T),]
-bat
+head(bat)
 ```
+
 ```{r}
 limenitis.abundance <- aggregate(x= limenitis.summer$scientific_name, by= list(limenitis.summer$place_state_name, limenitis.summer$place_county_name), FUN=length)
 
@@ -201,8 +202,9 @@ limenitis.abundance$Limenitis <- limenitis.abundance$x
 
 lim <- subset(limenitis.abundance, select = c(Location, Limenitis) )
 lim <- lim[order(lim$Limenitis,decreasing=T),]
-lim
+head(lim)
 ```
+
 ```{r}
 polyxenes.abundance <- aggregate(x= polyxenes.summer$scientific_name, by= list(polyxenes.summer$place_state_name, polyxenes.summer$place_county_name), FUN=length)
 
@@ -212,8 +214,9 @@ polyxenes.abundance$Polyxenes <- polyxenes.abundance$x
 
 pol <- subset(polyxenes.abundance, select = c(Location, Polyxenes) )
 pol <- pol[order(pol$Polyxenes,decreasing=T),]
-pol
+head(pol)
 ```
+
 ```{r}
 troilus.abundance <- aggregate(x= troilus.summer$scientific_name, by= list(troilus.summer$place_state_name, troilus.summer$place_county_name), FUN=length)
 
@@ -223,8 +226,9 @@ troilus.abundance$Troilus <- troilus.abundance$x
 
 tro <- subset(troilus.abundance, select = c(Location, Troilus) )
 tro <- tro[order(tro$Troilus,decreasing=T),]
-tro
+head(tro)
 ```
+
 ```{r}
 glaucus.abundance <- aggregate(x= new.glau$scientific_name, by= list(new.glau$place_state_name, new.glau$place_county_name), FUN=length)
 
@@ -234,8 +238,9 @@ glaucus.abundance$Glaucus <- glaucus.abundance$x
 
 gla <- subset(glaucus.abundance, select = c(Location, Glaucus) )
 gla <- gla[order(gla$Glaucus,decreasing=T),]
-gla
+head(gla)
 ```
+
 ```{r}
 diana.abundance <- aggregate(x= new.dia$scientific_name, by= list(new.dia$place_state_name, new.dia$place_county_name), FUN=length)
 
@@ -245,8 +250,9 @@ diana.abundance$Diana <- diana.abundance$x
 
 dia <- subset(diana.abundance, select = c(Location, Diana) )
 dia <- dia[order(dia$Diana,decreasing=T),]
-dia
+head(dia)
 ```
+
 ```{r}
 ###merge is designed to work with two dataframes 
 bl <- merge(bat, lim, all=TRUE)
@@ -254,22 +260,15 @@ pt <- merge(pol, tro, all=TRUE)
 blpt <- merge(bl, pt, all=TRUE)
 dg <- merge(dia, gla, all=TRUE)
 all <- merge(blpt, dg, all=TRUE)
-all
+head(all)
 ```
-
-
-## Order Code: limenitis.abundance <- limenitis.abundance[order(limenitis.abundance$x,decreasing=T),]
-
-Next Steps: 
-#get the number of sightings of each species in each county
-#use GIS to calculate the area (m^2) of each county 
-#use number of sightings and area (m^2) to calculate abundance in each county (# individuals & species / 1m^2)
 
 ```{r}
 c <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/county_area_data.csv")
 county_area <- read.csv(c, header = TRUE, sep = ",")
 head(county_area)
 ```
+
 ```{r}
 county_area$Location <- paste(county_area$name, county_area$state, sep = ", ")
 head(county_area)
@@ -277,11 +276,76 @@ head(county_area)
 county.area <- subset(county_area, select = c(Location, area_2010_square_km) )
 
 abundance_and_area <- merge(all, county.area, all=FALSE)
-abundance_and_area
+head(abundance_and_area)
 #### Land Area Data Source: https://www.openintro.org/data/?data=county_complete
 ```
 
+```{r}
+stnd_battus <- abundance_and_area$Battus/abundance_and_area$area_2010_square_km
+abundance_and_area$Battus_per_sq_km <- stnd_battus
+
+stnd_limenitis <- abundance_and_area$Limenitis/abundance_and_area$area_2010_square_km
+abundance_and_area$Limenitis_per_sq_km <- stnd_limenitis
+
+stnd_polyxenes <- abundance_and_area$Polyxenes/abundance_and_area$area_2010_square_km
+abundance_and_area$Polyxenes_per_sq_km <- stnd_polyxenes
+
+stnd_troilus <- abundance_and_area$Troilus/abundance_and_area$area_2010_square_km
+abundance_and_area$Troilus_per_sq_km <- stnd_troilus
+
+stnd_diana <- abundance_and_area$Diana/abundance_and_area$area_2010_square_km
+abundance_and_area$Diana_per_sq_km <- stnd_diana
+
+stnd_glaucus <- abundance_and_area$Glaucus/abundance_and_area$area_2010_square_km
+abundance_and_area$Glaucus_per_sq_km <- stnd_glaucus
+```
+
+```{r}
+absolute_abundance <- subset(abundance_and_area, select = c(Location, area_2010_square_km, Battus_per_sq_km,  Limenitis_per_sq_km, Polyxenes_per_sq_km, Troilus_per_sq_km, Diana_per_sq_km, Glaucus_per_sq_km) )
+
+head(absolute_abundance)
+absolute_abundance[is.na(absolute_abundance)] <- 0 ##Replace NAs with 0 
+head(absolute_abundance)
+```
+
+```{r}
+### Figuring out how to calculate relative abundance from absolute abundance 
+check <- subset(absolute_abundance, Location == "Abbeville, South Carolina", drop = FALSE)
+check <- subset(check, select = -c(Location, area_2010_square_km) )
+check[1,]
+
+total <- 0.003148755 + 0.005510322 + 0.002361567 + 0.002361567 + 0 + 0.002361567
+total
+ 
+check[1,]/total ### Example for relative abundance calculation 
+
+##funrar package  does the same thing! Compared against my own calculate to ensure it is doing what I want it to do 
+library(funrar)
+# Site-species matrix
+check.mat = as.matrix(check) # Absolute Abundance 
+check_rel_mat = make_relative(check.mat) # Relative Abundance (divide each species count by total for that county)
+```
+
+```{r}
+Location <- absolute_abundance$Location
+absolute_abundance <- subset(absolute_abundance, select = -c(Location, area_2010_square_km) )
+absolute_abundance_matrix <- as.matrix(absolute_abundance)
+relative_abundance = make_relative(absolute_abundance_matrix)
+
+relative_abundance <- cbind(Location, relative_abundance)
+relative_abundance <- as.data.frame(relative_abundance) ## convert from matrix back into data frame format 
+head(relative_abundance)[1:5,1:7]
+```
+
+```{r}
+##We've calculated the relative abundance of each species in each county, now I also want to be able to compare the species richness in each county 
+
+relative_abundance$species_richness <- rowSums(relative_abundance[-1] > 0)
+head(relative_abundance)
+```
+
 NEXT STEPS: 
-#divide all sighting numbers by area to get the frequency of sightings per square km
-#divide sighting record for each species by the most observed species (most abundant) in that county to get relative abundance (instead of absolute abundance)
+# Now figure out how to analyze statistically! 
+# package or modeling method to analyze relative abundance/ proportions?? 
+
 
