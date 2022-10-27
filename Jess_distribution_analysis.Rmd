@@ -67,7 +67,8 @@ butterfly_heatmap <- function(data, num_cells, extent){
   
 } 
 
-conus_extent <- c(-172.54, -47.74, 23.81, 86.46) # coordinate boundaries for continental US, as a vector
+conus_extent <- c(-125,-66, 25, 48) # coordinate boundaries for continental US (48 states), as a vector. I did not include all of North America, Alaska, and Hawaii.
+
 x <- 100 # number of raster tiles/pixels per raster. We will need to determine the optimal number of pixels to use here.
 
 ```
@@ -144,15 +145,13 @@ layerStats(pearson.lim_dia, 'pearson', na.rm=TRUE)
 ```
 
 
-
-
 [11] Applying the layerStats function to all rasters
 ```{r}
 pearson.bat_vs_all <- stack(battus_heat,limenitis_heat, polyxenes_heat, troilus_heat,glaucus_heat, diana_heat)
 layerStats(pearson.bat_vs_all, 'pearson', na.rm=TRUE)
 ```
 
-[12] Now we just have to obtain p-values for each of these correlation coefficients. Here is a function that returns a p-value for each Pearson's correlation coefficient.
+[12] Now we just have to obtain p-values for each of these correlation coefficients. Here is a function I wrote that returns a p-value for each Pearson's correlation coefficient.
 ```{r}
 cor_p_values <- function(x,y){
   result <- cor.test(x@data@values,y@data@values,
@@ -167,4 +166,16 @@ cor_p_values <- function(x,y){
 ```{r}
 p_lim_bat <- cor_p_values(battus_heat,limenitis_heat)
 show(p_lim_bat)
+
+p_bat_pol <- cor_p_values(battus_heat,polyxenes_heat)
+show(p_bat_pol)
+
+p_bat_tro <- cor_p_values(battus_heat,troilus_heat)
+show(p_bat_tro)
+
+p_bat_gla <- cor_p_values(battus_heat,glaucus_heat)
+show(p_bat_gla)
+
+p_bat_dia <- cor_p_values(battus_heat,diana_heat)
+show(p_bat_dia)
 ```
