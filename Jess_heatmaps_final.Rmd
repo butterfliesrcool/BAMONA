@@ -170,7 +170,7 @@ Final sample sizes after data cleaning
 ```{r}
 library("rstudioapi")
 library("ggmap")
-register_google(key = "AIzaSyAYvftG7uvL7-jVqHKLG0fVN14AFcY8Q0k")
+register_google(key = "")
 ```
 
 [6] Generate heat maps for all species
