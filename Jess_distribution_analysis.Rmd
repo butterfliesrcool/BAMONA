@@ -88,20 +88,20 @@ diana_heat <- butterfly_heatmap(diana, n=x, conus_extent)
 
 # We can also play around with the s-value argument. This is the size of the moving window used to determine correlation. The smaller the window, the higher the resolution. For now, it is arbitrarily set to 5.
 
-r.cor_lim <- rasterCorrelation(battus_heat, limenitis_heat, s = 5, type = "pearson")
-plot(r.cor_lim)
+rcor_lim <- rasterCorrelation(battus_heat, limenitis_heat, s = 5, type = "pearson")
+plot(rcor_lim)
 
-r.cor_pol <- rasterCorrelation(battus_heat, polyxenes_heat, s = 5, type = "pearson")
-plot(r.cor_pol)
+rcor_pol <- rasterCorrelation(battus_heat, polyxenes_heat, s = 5, type = "pearson")
+plot(rcor_pol)
 
-r.cor_tro <- rasterCorrelation(battus_heat, troilus_heat, s = 5, type = "pearson")
-plot(r.cor_tro)
+rcor_tro <- rasterCorrelation(battus_heat, troilus_heat, s = 5, type = "pearson")
+plot(rcor_tro)
 
-r.cor_gla <- rasterCorrelation(battus_heat, glaucus_heat, s = 5, type = "pearson")
-plot(r.cor_gla)
+rcor_gla <- rasterCorrelation(battus_heat, glaucus_heat, s = 5, type = "pearson")
+plot(rcor_gla)
 
-r.cor_dia <- rasterCorrelation(battus_heat, diana_heat, s = 5, type = "pearson")
-plot(r.cor_dia)
+rcor_dia <- rasterCorrelation(battus_heat, diana_heat, s = 5, type = "pearson")
+plot(rcor_dia)
 ```
 
 [9] Find Pearson's correlation coefficient for each mimetic species vs. Battus using the layerStats function (numerical value) - need to check what exactly this does (I'm assuming it's an average of the correlation coefficients?)
@@ -125,7 +125,7 @@ pearson.bat_dia <- stack(battus_heat, diana_heat)
 layerStats(pearson.bat_dia, 'pearson', na.rm=TRUE)
 ```
 
-[10]
+[10] What about when we compare Limenitis with the other mimics?
 ```{r}
 # I chose not to repeat the battus-limenitis comparison here.
 
@@ -178,4 +178,196 @@ show(p_bat_gla)
 
 p_bat_dia <- cor_p_values(battus_heat,diana_heat)
 show(p_bat_dia)
+```
+
+[14] The next step is to analyze Northern and Southern populations separately. To start, I will create new vectors to use in the butterfly_heatmap function.
+```{r}
+# Defining new variables/windows.For reference: c(longitude min, longitude max, latitude min, latitude max)
+
+northern_extent <- c(-125,-66,38,48) #north of 38 deg. lat (still in con. US)
+southern_extent <- c(-125,-66,25,38) #south of 38 deg. lat (still in con. US)
+```
+
+[15] Produce heat maps for each species, isolating NORTHERN parts of each species' range.
+```{r}
+battus_heat_north <- butterfly_heatmap(battus, n=x, northern_extent)
+limenitis_heat_north <- butterfly_heatmap(limenitis, n=x, northern_extent)
+polyxenes_heat_north <- butterfly_heatmap(polyxenes, n=x, northern_extent)
+troilus_heat_north <- butterfly_heatmap(troilus, n=x, northern_extent)
+glaucus_heat_north <- butterfly_heatmap(glaucus, n=x, northern_extent)
+diana_heat_north <- butterfly_heatmap(diana, n=x, northern_extent)
+
+plot(battus_heat_north)
+plot(limenitis_heat_north)
+plot(polyxenes_heat_north)
+plot(troilus_heat_north)
+plot(glaucus_heat_north)
+plot(diana_heat_north)
+```
+
+[16] Generate a raster that represents Pearson's correlation coefficient between each northern heatmap (again Battus vs. each mimic)
+```{r}
+
+# We can also play around with the s-value argument. This is the size of the moving window used to determine correlation. The smaller the window, the higher the resolution. For now, it is arbitrarily set to 5.
+
+rcor_lim_nor <- rasterCorrelation(battus_heat_north, limenitis_heat_north, s = 5, type = "pearson")
+plot(rcor_lim_nor)
+
+rcor_pol_nor <- rasterCorrelation(battus_heat_north, polyxenes_heat_north, s = 5, type = "pearson")
+plot(rcor_pol_nor)
+
+rcor_tro_nor <- rasterCorrelation(battus_heat_north, troilus_heat_north, s = 5, type = "pearson")
+plot(rcor_tro_nor)
+
+rcor_gla_nor <- rasterCorrelation(battus_heat_north, glaucus_heat_north, s = 5, type = "pearson")
+plot(rcor_gla_nor)
+
+rcor_dia_nor <- rasterCorrelation(battus_heat_north, diana_heat_north, s = 5, type = "pearson")
+plot(rcor_dia_nor)
+```
+[17] Finding Pearson's correlation coefficient for each mimetic species vs. Battus in the North only
+```{r}
+pearson.bat_lim_nor <- stack(battus_heat_north, limenitis_heat_north)
+layerStats(pearson.bat_lim_nor, 'pearson', na.rm=TRUE)
+
+pearson.bat_pol_nor <- stack(battus_heat_north, polyxenes_heat_north)
+layerStats(pearson.bat_pol_nor, 'pearson', na.rm=TRUE)
+
+pearson.bat_tro_nor <- stack(battus_heat_north, troilus_heat_north)
+layerStats(pearson.bat_tro_nor, 'pearson', na.rm=TRUE)
+
+pearson.bat_gla_nor <- stack(battus_heat_north, glaucus_heat_north)
+layerStats(pearson.bat_gla_nor, 'pearson', na.rm=TRUE)
+
+pearson.bat_dia_nor <- stack(battus_heat_north, diana_heat_north)
+layerStats(pearson.bat_dia_nor, 'pearson', na.rm=TRUE)
+```
+
+[18] Now the interesting part! Comparing Limenitis vs. the other mimics in the North...
+```{r}
+# Again, I chose not to repeat the battus-limenitis comparison here.
+
+pearson.lim_pol_nor <- stack(limenitis_heat_north, polyxenes_heat_north)
+layerStats(pearson.lim_pol_nor, 'pearson', na.rm=TRUE)
+
+pearson.lim_tro_nor <- stack(limenitis_heat_north, troilus_heat_north)
+layerStats(pearson.lim_tro_nor, 'pearson', na.rm=TRUE)
+
+pearson.lim_gla_nor <- stack(limenitis_heat_north, glaucus_heat_north)
+layerStats(pearson.lim_gla_nor, 'pearson', na.rm=TRUE)
+
+pearson.lim_dia_nor <- stack(limenitis_heat_north, diana_heat_north)
+layerStats(pearson.lim_dia_nor, 'pearson', na.rm=TRUE)
+```
+
+[19] Applying the layerStats function to all rasters - North only
+```{r}
+pearson.bat_vs_all_nor <- stack(battus_heat_north,limenitis_heat_north, polyxenes_heat_north, troilus_heat_north,glaucus_heat_north, diana_heat_north)
+layerStats(pearson.bat_vs_all_nor, 'pearson', na.rm=TRUE)
+```
+
+[20] p-values for each (northern) pairwise comparison
+```{r}
+p_lim_bat_nor <- cor_p_values(battus_heat_north,limenitis_heat_north)
+show(p_lim_bat_nor)
+
+p_bat_pol_nor <- cor_p_values(battus_heat_north,polyxenes_heat_north)
+show(p_bat_pol_nor)
+
+p_bat_tro_nor <- cor_p_values(battus_heat_north,troilus_heat_north)
+show(p_bat_tro_nor)
+
+p_bat_gla_nor <- cor_p_values(battus_heat_north,glaucus_heat_north)
+show(p_bat_gla_nor)
+
+p_bat_dia_nor <- cor_p_values(battus_heat_north,diana_heat_north)
+show(p_bat_dia_nor) # I think this is super high because there is no "diana heatmap" for the north; it's all blank, so R can't calculate a meaningful p-value.
+```
+
+[21] Repeating this analysis for the SOUTHERN part of each species' range.
+```{r}
+battus_heat_south <- butterfly_heatmap(battus, n=x, southern_extent)
+limenitis_heat_south <- butterfly_heatmap(limenitis, n=x, southern_extent)
+polyxenes_heat_south <- butterfly_heatmap(polyxenes, n=x, southern_extent)
+troilus_heat_south <- butterfly_heatmap(troilus, n=x, southern_extent)
+glaucus_heat_south <- butterfly_heatmap(glaucus, n=x, southern_extent)
+diana_heat_south <- butterfly_heatmap(diana, n=x, southern_extent)
+
+plot(battus_heat_south)
+plot(limenitis_heat_south)
+plot(polyxenes_heat_south)
+plot(troilus_heat_south)
+plot(glaucus_heat_south)
+plot(diana_heat_south)
+```
+
+[22] Pearson's correlation coefficient (rasters) between each southern heatmap (again Battus vs. each mimic)
+```{r}
+rcor_lim_sou <- rasterCorrelation(battus_heat_south, limenitis_heat_south, s = 5, type = "pearson")
+plot(rcor_lim_sou)
+
+rcor_pol_sou <- rasterCorrelation(battus_heat_south, polyxenes_heat_south, s = 5, type = "pearson")
+plot(rcor_pol_sou)
+
+rcor_tro_sou <- rasterCorrelation(battus_heat_south, troilus_heat_south, s = 5, type = "pearson")
+plot(rcor_tro_sou)
+
+rcor_gla_sou <- rasterCorrelation(battus_heat_south, glaucus_heat_south, s = 5, type = "pearson")
+plot(rcor_gla_sou)
+
+rcor_dia_sou <- rasterCorrelation(battus_heat_south, diana_heat_south, s = 5, type = "pearson")
+plot(rcor_dia_sou)
+```
+
+[23] Finding Pearson's correlation coefficient for each mimetic species vs. Battus in the South only
+```{r}
+pearson.bat_lim_sou <- stack(battus_heat_south, limenitis_heat_south)
+layerStats(pearson.bat_lim_sou, 'pearson', na.rm=TRUE)
+
+pearson.bat_pol_sou <- stack(battus_heat_south, polyxenes_heat_south)
+layerStats(pearson.bat_pol_sou, 'pearson', na.rm=TRUE)
+
+pearson.bat_tro_sou <- stack(battus_heat_south, troilus_heat_south)
+layerStats(pearson.bat_tro_sou, 'pearson', na.rm=TRUE)
+
+pearson.bat_gla_sou <- stack(battus_heat_south, glaucus_heat_south)
+layerStats(pearson.bat_gla_sou, 'pearson', na.rm=TRUE)
+
+pearson.bat_dia_sou <- stack(battus_heat_south, diana_heat_south)
+layerStats(pearson.bat_dia_sou, 'pearson', na.rm=TRUE)
+```
+
+[24] Pearson's CC for Limenitis vs. other mimics in the South
+```{r}
+# Excluding the battus-limenitis comparison for brevity.
+
+pearson.lim_pol_sou <- stack(limenitis_heat_south, polyxenes_heat_south)
+layerStats(pearson.lim_pol_sou, 'pearson', na.rm=TRUE)
+
+pearson.lim_tro_sou <- stack(limenitis_heat_south, troilus_heat_south)
+layerStats(pearson.lim_tro_sou, 'pearson', na.rm=TRUE)
+
+pearson.lim_gla_sou <- stack(limenitis_heat_south, glaucus_heat_south)
+layerStats(pearson.lim_gla_sou, 'pearson', na.rm=TRUE)
+
+pearson.lim_dia_sou <- stack(limenitis_heat_south, diana_heat_south)
+layerStats(pearson.lim_dia_sou, 'pearson', na.rm=TRUE)
+```
+
+[25] Calculating p-values for each pairwise comparison.
+```{r}
+p_lim_bat_sou <- cor_p_values(battus_heat_south,limenitis_heat_south)
+show(p_lim_bat_sou)
+
+p_bat_pol_sou <- cor_p_values(battus_heat_south,polyxenes_heat_south)
+show(p_bat_pol_sou)
+
+p_bat_tro_sou <- cor_p_values(battus_heat_south,troilus_heat_south)
+show(p_bat_tro_sou)
+
+p_bat_gla_sou <- cor_p_values(battus_heat_south,glaucus_heat_south)
+show(p_bat_gla_sou)
+
+p_bat_dia_sou <- cor_p_values(battus_heat_south,diana_heat_south)
+show(p_bat_dia_sou)
 ```
