@@ -178,6 +178,7 @@ abundance$Species <- abundance$Group.3
 abundance$Sightings <- abundance$x
 
 abundance <- subset(abundance, select = c(Location, Species, Sightings) )
+abundance <- abundance[order(abundance$Sightings,decreasing=T),]
 head(abundance)
 ```
 
@@ -276,9 +277,17 @@ head(county_area)
 county.area <- subset(county_area, select = c(Location, area_2010_square_km) )
 
 abundance_and_area <- merge(all, county.area, all=FALSE)
+abundance_and_area[is.na(abundance_and_area)] <- 0 ##Replace NAs with 0 
 head(abundance_and_area)
 #### Land Area Data Source: https://www.openintro.org/data/?data=county_complete
+
+sums <- subset(abundance_and_area, select = -c(Location, area_2010_square_km) )
+density <- rowSums(sums)
+
+abundance_and_area$Species.Density <- density
+abundance_and_area
 ```
+
 
 ```{r}
 stnd_battus <- abundance_and_area$Battus/abundance_and_area$area_2010_square_km
@@ -331,6 +340,7 @@ Location <- absolute_abundance$Location
 absolute_abundance <- subset(absolute_abundance, select = -c(Location, area_2010_square_km) )
 absolute_abundance_matrix <- as.matrix(absolute_abundance)
 relative_abundance = make_relative(absolute_abundance_matrix)
+relative_abundance <- round(relative_abundance, digits = 4)
 
 relative_abundance <- cbind(Location, relative_abundance)
 relative_abundance <- as.data.frame(relative_abundance) ## convert from matrix back into data frame format 
@@ -341,11 +351,36 @@ head(relative_abundance)[1:5,1:7]
 ##We've calculated the relative abundance of each species in each county, now I also want to be able to compare the species richness in each county 
 
 relative_abundance$species_richness <- rowSums(relative_abundance[-1] > 0)
-head(relative_abundance)
+head(relative_abundance) ## comparing 2,232 counties in the United States 
+```
+```{r}
+relative_abundance$Species.Density <- density
+relative_abundance <- relative_abundance[order(relative_abundance$Species.Density,decreasing=T),]
+relative_abundance
+```
+Data Summary:
+```{r}
+bat ## Battus sighting counts by county
+lim ##Limenitis sighting counts by county 
+pol ## Polyxenes sighting counts by county 
+gla ## Glaucus sighting counts by county 
+dia ## Diana sighting counts by county 
+tro ## Troilus sighting counts by county 
+
+abundance_and_area ## Sighting counts and land area (km^2) & summed species density for each county 
+absolute_abundance ## Sighting counts divided by land area: standardized sightings/ km^2
+relative_abundance ## proportion (percent) of sightings in each county that represent each species & species richness and species density in each county
 ```
 
 NEXT STEPS: 
 # Now figure out how to analyze statistically! 
 # package or modeling method to analyze relative abundance/ proportions?? 
+# based on classic predictions about mimetic load, we would expect to see higher species richness when battus is more abundant 
+  # compare species richness to the raw sighting count per county? 
+  # might also be good to make a data column for the total number of sightings by county to account for frequency     vs. density differences 
+# based on classic predictions of frequency dependence in mimicry, we would expect to see higher relative abundance in Battus compared to its mimic & we might see unique patterns of abundance that correlate to the degree of mimetic perfection 
+  # see if relative abundance correlates to species density in each county 
+  # see if relative abundance & species richness varies in the heart of Battus's range compared to the range edge     and if it varies with overall species density 
+      # pull out counties where Battus is most abundant? 
 
 
