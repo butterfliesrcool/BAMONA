@@ -905,6 +905,10 @@ all.data
 ```{r}
 library("rstudioapi")
 library("ggmap")
+<<<<<<< HEAD
+=======
+register_google(key = "")
+>>>>>>> 0926a620cee7b3c4d1032ad4aa561525eefec200
 ```
 
 [6] Generate heat maps for all species

@@ -1,0 +1,1014 @@
+---
+title: "abundance-by-county-all"
+author: "Maria"
+date: "10/24/2022"
+output: html_document
+---
+#Load Package Libraries
+```{r}
+library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR)
+library(cowplot)
+library(googleway)
+library(ggrepel)
+library(ggspatial)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+```
+
+#iNaturalist data Battus
+```{r}
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_battus_philenor_for_r.csv")
+iNat.battus <- read.csv(b, header = TRUE, sep = ",")
+head(iNat.battus)
+```
+```{r}
+##   battus 
+length(iNat.battus$id)
+
+b <- subset(iNat.battus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+battus <- na.omit(b)
+length(battus$id)
+
+```
+
+
+```{r}
+nat.bat <- st_as_sf(battus, coords = c("longitude", "latitude"))
+battus <- ggplot() + geom_sf(data = nat.bat, color = "light pink", alpha = 0.5) + theme_bw()
+battus
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+b <- subset(iNat.battus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+battus <- na.omit(b)
+
+iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = battus, geom = "polygon") +
+  
+  labs(fill="B. philenor Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_battus_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+b <- subset(iNat.battus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+battus <- na.omit(b)
+length(battus$id)
+
+library(lubridate)
+dates <- parse_date_time(battus$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+battus$months <- months
+battus
+```
+
+```{r}
+summer <- subset(battus, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_battus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="B. philenor Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_battus_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= battus$scientific_name, by= list(battus$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+b <- ggplot(abundance, aes(x=months, y=sightings)) 
+b <- b + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+b
+```
+```{r}
+northern.range <- subset(battus, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+b <- ggplot(abundance, aes(x=months, y=sightings)) 
+b <- b + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+b <- b + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+b
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= battus$scientific_name, by= list(battus$place_state_name, battus$place_county_name), FUN=length)
+abundance #abundance by county and state... divides battus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = battus$longitude, y = battus$latitude)
+head(df)
+
+df <- within(battus, {
+  grp.x = cut(battus$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(battus$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+#Limenitis arthemis astyanax
+```{r}
+c <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_limenitis_arthemis_astyanax.csv")
+iNat.limenitis <- read.csv(c, header = TRUE, sep = ",")
+head(iNat.limenitis)
+```
+```{r}
+##   Limenitis
+length(iNat.limenitis$id)
+
+c <- subset(iNat.limenitis, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(c)
+
+limenitis <- na.omit(c)
+length(limenitis$id)
+
+```
+
+
+```{r}
+nat.lim <- st_as_sf(limenitis, coords = c("longitude", "latitude"))
+limenitis <- ggplot() + geom_sf(data = nat.lim, color = "light green", alpha = 0.5) + theme_bw()
+limenitis
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+c <- subset(iNat.limenitis, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+limenitis <- na.omit(c)
+
+iNat_limenitis_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = limenitis, geom = "polygon") +
+  
+  labs(fill="L.arthemis Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_limenitis_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+c <- subset(iNat.limenitis, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(c)
+
+limenitis <- na.omit(c)
+length(limenitis$id)
+
+library(lubridate)
+dates <- parse_date_time(limenitis$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+limenitis$months <- months
+limenitis
+```
+
+```{r}
+summer <- subset(limenitis, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_limenitis_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="L.arthemis Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_limenitis_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= limenitis$scientific_name, by= list(limenitis$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+c <- ggplot(abundance, aes(x=months, y=sightings)) 
+c <- c + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+c <- c + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+c
+```
+```{r}
+northern.range <- subset(limenitis, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+c <- ggplot(abundance, aes(x=months, y=sightings)) 
+c <- c + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+c <- c + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+c
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= limenitis$scientific_name, by= list(limenitis$place_state_name, limenitis$place_county_name), FUN=length)
+abundance #abundance by county and state... divides limenitis data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = limenitis$longitude, y = limenitis$latitude)
+head(df)
+
+df <- within(limenitis, {
+  grp.x = cut(limenitis$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(limenitis$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+#Papilio glaucus
+```{r}
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_glaucus%20(version%201).xlsb.csv")
+iNat.glaucus <- read.csv(d, header = TRUE, sep = ",")
+head(iNat.glaucus)
+```
+```{r}
+##   battus 
+length(iNat.glaucus$id)
+
+d <- subset(iNat.glaucus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name,morph) )
+head(d)
+
+glaucus <- na.omit(d)
+glaucus<- subset(glaucus, morph == "black", drop = FALSE)
+length(glaucus$id)
+#sort by morph
+```
+
+
+```{r}
+nat.glaucus <- st_as_sf(glaucus, coords = c("longitude", "latitude"))
+glaucus <- ggplot() + geom_sf(data = nat.glaucus, color = "red", alpha = 0.5) + theme_bw()
+glaucus
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+d <- subset(iNat.glaucus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name,morph) )
+head(d)
+
+glaucus <- na.omit(d)
+glaucus<- subset(glaucus, morph == "black", drop = FALSE)
+
+iNat_glaucus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = glaucus, geom = "polygon") +
+  
+  labs(fill="P.glaucus Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_glaucus_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+d <- subset(iNat.glaucus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name,morph) )
+head(d)
+
+glaucus <- na.omit(d)
+glaucus<- subset(glaucus, morph == "black", drop = FALSE)
+length(glaucus$id)
+
+library(lubridate)
+dates <- parse_date_time(glaucus$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+glaucus$months <- months
+glaucus
+```
+
+```{r}
+summer <- subset(glaucus, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_glaucus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="P.glaucus Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_glaucus_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= glaucus$scientific_name, by= list(glaucus$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+d <- ggplot(abundance, aes(x=months, y=sightings)) 
+d <- d + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+d <- d + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+d
+```
+```{r}
+northern.range <- subset(glaucus, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+d <- ggplot(abundance, aes(x=months, y=sightings)) 
+d <- d + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+d <- d + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+d
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= glaucus$scientific_name, by= list(glaucus$place_state_name, glaucus$place_county_name), FUN=length)
+abundance #abundance by county and state... divides Glaucus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = glaucus$longitude, y = glaucus$latitude)
+head(df)
+
+df <- within(glaucus, {
+  grp.x = cut(glaucus$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(glaucus$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+
+#Papilio polyxenes
+```{r}
+e <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_polyxenes.csv")
+iNat.poly <- read.csv(e, header = TRUE, sep = ",")
+head(iNat.poly)
+```
+```{r}
+##   polyxenes
+length(iNat.poly$id)
+
+e <- subset(iNat.poly, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(e)
+
+polyxenes <- na.omit(e)
+length(polyxenes$id)
+
+```
+
+
+```{r}
+nat.poly <- st_as_sf(polyxenes, coords = c("longitude", "latitude"))
+polyxenes <- ggplot() + geom_sf(data = nat.poly, color = "purple", alpha = 0.5) + theme_bw()
+polyxenes
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+e <- subset(iNat.poly, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(e)
+
+polyxenes <- na.omit(e)
+
+iNat_polyxenes_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = battus, geom = "polygon") +
+  
+  labs(fill="P.polyxenes Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_polyxenes_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+e <- subset(iNat.poly, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(e)
+
+polyxenes <- na.omit(e)
+length(polyxenes$id)
+
+library(lubridate)
+dates <- parse_date_time(polyxenes$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+polyxenes$months <- months
+polyxenes
+```
+
+```{r}
+summer <- subset(polyxenes, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_polyxenes_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="P.polyxenes Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_polyxenes_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= polyxenes$scientific_name, by= list(polyxenes$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+e <- ggplot(abundance, aes(x=months, y=sightings)) 
+e <- e + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+e <- e + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+e
+```
+```{r}
+northern.range <- subset(polyxenes, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+e <- ggplot(abundance, aes(x=months, y=sightings)) 
+e <- e + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+e <- e + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+e
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= polyxenes$scientific_name, by= list(polyxenes$place_state_name, polyxenes$place_county_name), FUN=length)
+abundance #abundance by county and state... divides battus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = polyxenes$longitude, y = polyxenes$latitude)
+head(df)
+
+df <- within(polyxenes, {
+  grp.x = cut(polyxenes$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(polyxenes$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+#Papilio troilus
+```{r}
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_papilio_troilus.csv")
+iNat.troilus <- read.csv(g, header = TRUE, sep = ",")
+head(iNat.troilus)
+```
+```{r}
+##   troilus
+length(iNat.troilus$id)
+
+g <- subset(iNat.troilus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(g)
+
+troilus <- na.omit(g)
+length(troilus$id)
+
+```
+
+
+```{r}
+nat.troilus <- st_as_sf(troilus, coords = c("longitude", "latitude"))
+troilus <- ggplot() + geom_sf(data = nat.bat, color = "orange", alpha = 0.5) + theme_bw()
+troilus
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+g <- subset(iNat.troilus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(g)
+
+troilus <- na.omit(g)
+
+iNat_troilus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = battus, geom = "polygon") +
+  
+  labs(fill="P.troilus Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_troilus_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+g <- subset(iNat.troilus, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+head(b)
+
+troilus <- na.omit(g)
+length(troilus$id)
+
+library(lubridate)
+dates <- parse_date_time(troilus$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+troilus$months <- months
+troilus
+```
+
+```{r}
+summer <- subset(troilus, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_troilus_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="P.troilus Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_troilus_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= troilus$scientific_name, by= list(troilus$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+g <- ggplot(abundance, aes(x=months, y=sightings)) 
+g <- g + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+g <- g + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+g
+```
+```{r}
+northern.range <- subset(troilus, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+g <- ggplot(abundance, aes(x=months, y=sightings)) 
+g <- g + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+g <- g + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+g
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= troilus$scientific_name, by= list(troilus$place_state_name, troilus$place_county_name), FUN=length)
+abundance #abundance by county and state... divides troilus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = troilus$longitude, y = troilus$latitude)
+head(df)
+
+df <- within(troilus, {
+  grp.x = cut(troilus$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(troilus$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```
+#Speyeria diana
+```{r}
+f <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/iNaturalist_speyeria_diana_edited%20-%20Sheet1.csv")
+iNat.speyeria <- read.csv(f, header = TRUE, sep = ",")
+head(iNat.speyeria)
+```
+```{r}
+##   Speyeria
+length(iNat.speyeria$id)
+
+f <- subset(iNat.speyeria, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name,sex) )
+head(f)
+
+speyeria <- na.omit(f)
+speyeria <- subset(speyeria, sex == "f", drop = FALSE)
+length(speyeria$id)
+
+```
+
+
+```{r}
+nat.spy <- st_as_sf(speyeria, coords = c("longitude", "latitude"))
+speyeria <- ggplot() + geom_sf(data = nat.spy, color = "light blue", alpha = 0.5) + theme_bw()
+speyeria
+```
+
+
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "AIzaSyDKLhLfHUGsORnZkq7V1mXILyP4TmxZgdc")
+```
+
+```{r}
+f <- subset(iNat.speyeria, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name,sex) )
+head(f)
+
+speyeria <- na.omit(f)
+speyeria <- subset(speyeria, sex == "f", drop = FALSE)
+
+iNat_speyeria_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 100, data = speyeria, geom = "polygon") +
+  
+  labs(fill="S.Diana Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_speyeria_heatmap ##pull out just the summer months 
+```
+
+## use lubricate package to create column with just months from the dates 
+```{r}
+f <- subset(iNat.speyeria, select = c(id,observed_on, latitude, longitude, place_county_name, place_state_name,scientific_name,sex) )
+head(f)
+
+speyeria <- na.omit(f)
+speyeria <- subset(speyeria, sex == "f", drop = FALSE)
+length(speyeria$id)
+
+library(lubridate)
+dates <- parse_date_time(speyeria$observed_on, "ymd")
+length(dates)
+months <- months(dates)
+length(months)
+
+speyeria$months <- months
+speyeria
+```
+
+```{r}
+summer <- subset(speyeria, months %in% c( "June", "July", "August"), drop = FALSE)
+
+iNat_speyeria_heatmap <- ggmap(get_googlemap(center = c(lon = -98, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color')) +
+  
+  stat_density2d(aes(x = longitude, y = latitude, fill = ..level..),
+                 alpha = 0.2,
+                 bins = 50, data = summer, geom = "polygon") +
+  
+  labs(fill="S.diana Population Density in Summer Months") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+iNat_speyeria_heatmap ##pull out just the summer months 
+```
+```{r}
+peaks.by.month <- aggregate(x= speyeria$scientific_name, by= list(speyeria$months), FUN=length)
+peaks.by.month
+
+months <- peaks.by.month$Group.1
+length(months)
+sightings <- peaks.by.month$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+f <- ggplot(abundance, aes(x=months, y=sightings)) 
+f <- f + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+f <- f + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+f
+```
+```{r}
+northern.range <- subset(speyeria, place_state_name %in% c( "Illinois", "Indiana", "Ohio", "Pennsylvania", "New York", "Connecticut", "New Jersey", "Delaware", "Maryland", "West Virginia", "Virginia", "Kentucky", "Missouri", "Tennessee", "North Carolina"), drop = FALSE)
+length(northern.range$id)
+
+peaks.by.month.north <- aggregate(x= northern.range$scientific_name, by= list(northern.range$months), FUN=length)
+
+months <- peaks.by.month.north$Group.1
+length(months)
+sightings <- peaks.by.month.north$x
+length(sightings)
+abundance <- data.frame(months, sightings)
+abundance
+
+f <- ggplot(abundance, aes(x=months, y=sightings)) 
+f <- f + geom_bar(stat="identity", color="black",fill="grey")
+#geom_bar creates the bar plot, the commands "color=" and "fill=" allow you to change the color of the bar outlines and fill, respectively
+
+f <- f + scale_x_discrete(limits =  c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") )
+f
+#R will usually automatically sort variables alphabetically, so the "limits" command here allows you to override that and manually specify the order of variables in the ggplot.
+```
+
+```{r}
+abundance <- aggregate(x= speyeria$scientific_name, by= list(speyeria$place_state_name, speyeria$place_county_name), FUN=length)
+abundance #abundance by county and state... divides battus data into 1,427 different "zones" 
+abundance <- abundance[order(abundance$scientific_name,decreasing=T),]
+```
+
+```{r}
+set.seed(2)
+n <- 50
+df <- data.frame(x = speyeria$longitude, y = speyeria$latitude)
+head(df)
+
+df <- within(speyeria, {
+  grp.x = cut(speyeria$longitude, (0:3)/3, labels = FALSE)
+  grp.y = cut(speyeria$latitude, (0:3)/3, labels = FALSE)
+})
+head(df)
+```

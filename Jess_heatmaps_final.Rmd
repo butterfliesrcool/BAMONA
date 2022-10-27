@@ -1,0 +1,320 @@
+---
+title: "Jess_heatmaps_final"
+author: "Jessica Herrmann"
+date: "2022-10-27"
+output: html_document
+---
+[1] Load package libraries
+```{r}
+library(curl)
+library(sf)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(adehabitatHR) ##kernel density package 
+library(cowplot)
+library(googleway)
+library(ggrepel)
+library(ggspatial)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library("tidyverse")
+library("maps")
+library("mapproj") #using this to create a projection using a coordinate system (map will appear curved, reflective of the Earth's curvature)
+library("magrittr")
+library("ggplot2")
+```
+
+[2] Import data
+```{r}
+##   battus
+b <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+battus <- read.csv(b, header = TRUE, sep = ",")
+```
+
+```{r}
+##   limenitis 
+l <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+limenitis <- read.csv(l, header = TRUE, sep = ",")
+```
+
+```{r}
+##   glaucus
+g <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+glaucus <- read.csv(g, header = TRUE, sep = ",")
+```
+
+```{r}
+##   polyxenes
+p <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+polyxenes <- read.csv(p, header = TRUE, sep = ",")
+```
+
+```{r}
+##   troilus
+t <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+troilus <- read.csv(t, header = TRUE, sep = ",")
+```
+
+```{r}
+##   diana 
+d <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+diana <- read.csv(d, header = TRUE, sep = ",")
+```
+
+[3] Clean data: remove NA values, remove all data points that don't include a specimen or photograph, and remove unnecessary data columns
+```{r}
+##   battus 
+
+length(battus$Record.Number)
+clean.battus <- na.omit(battus)
+length(clean.battus$Record.Number)
+
+b <- subset(clean.battus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+battus <- subset(b, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(battus$Record.Number)
+battus
+```
+
+```{r}
+##limenitis 
+
+length(limenitis$Record.Number)
+clean.limenitis <- na.omit(limenitis)
+length(clean.limenitis$Record.Number)
+
+l <- subset(clean.limenitis, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+limenitis <- subset(l, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(limenitis$Record.Number)
+limenitis
+```
+
+```{r}
+##   glaucus
+
+length(glaucus$Record.Number)
+clean.glaucus <- na.omit(glaucus)
+length(clean.glaucus$Record.Number)
+
+g <- subset(clean.glaucus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+glaucus <- subset(g, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+##   polyxenes
+
+length(polyxenes$Record.Number)
+clean.polyxenes <- na.omit(polyxenes)
+length(clean.polyxenes$Record.Number)
+
+p <- subset(clean.polyxenes, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+polyxenes <- subset(p, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(polyxenes$Record.Number)
+polyxenes
+```
+
+```{r}
+##   troilus
+
+length(troilus$Record.Number)
+clean.troilus <- na.omit(troilus)
+length(clean.troilus$Record.Number)
+
+t <- subset(clean.troilus, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+troilus <- subset(t, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(troilus$Record.Number)
+troilus
+```
+
+```{r}
+##   diana 
+
+length(diana$Record.Number)
+clean.diana <- na.omit(diana)
+length(clean.diana$Record.Number)
+
+diana <- subset(clean.diana, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+[4] Pull out only the mimetic forms for Papilio glaucus and Speyeria diana
+```{r}
+##   glaucus 
+
+glaucus<- subset(glaucus, Sex == "BF", drop = FALSE)
+length(glaucus$Record.Number)
+glaucus
+```
+
+```{r}
+## diana 
+
+diana <- subset(diana, sex == "F", drop = FALSE)
+length(diana$Record.Number)
+diana
+```
+
+Final sample sizes after data cleaning 
+- battus: 1282
+- limenitis: 1700
+- glaucus: 695
+- polyxenes: 2798
+- troilus: 1822
+- diana: 70
+
+
+[5] Linking in Google Maps API key
+```{r}
+library("rstudioapi")
+library("ggmap")
+register_google(key = "")
+```
+
+[6] Generate heat maps for all species
+```{r}
+battus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = battus, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+battus_heatmap
+```
+
+
+```{r}
+limenitis_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = limenitis, geom = "polygon") +
+  labs(fill="L. arthemis astyanax
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+limenitis_heatmap
+```
+
+```{r}
+glaucus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = glaucus, geom = "polygon") +
+  labs(fill="P. glaucus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+glaucus_heatmap
+```
+
+```{r}
+polyxenes_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = polyxenes, geom = "polygon") +
+  labs(fill="P. polyxenes
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+polyxenes_heatmap
+```
+
+```{r}
+troilus_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = troilus, geom = "polygon") +
+  labs(fill="P. troilus
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+troilus_heatmap
+```
+
+```{r}
+diana_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = diana, geom = "polygon") +
+  labs(fill="B. philenor
+Population Density") +
+  scale_fill_viridis_c(option = "plasma")
+
+## Need to figure out how to italicize species names
+
+#Removing Google Maps ticks and labels??
+theme(axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_blank())
+
+diana_heatmap
+```
