@@ -340,6 +340,7 @@ Location <- absolute_abundance$Location
 absolute_abundance <- subset(absolute_abundance, select = -c(Location, area_2010_square_km) )
 absolute_abundance_matrix <- as.matrix(absolute_abundance)
 relative_abundance = make_relative(absolute_abundance_matrix)
+relative_abundance <- round(relative_abundance, digits = 4)
 
 relative_abundance <- cbind(Location, relative_abundance)
 relative_abundance <- as.data.frame(relative_abundance) ## convert from matrix back into data frame format 
@@ -357,7 +358,19 @@ relative_abundance$Species.Density <- density
 relative_abundance <- relative_abundance[order(relative_abundance$Species.Density,decreasing=T),]
 relative_abundance
 ```
+Data Summary:
+```{r}
+bat ## Battus sighting counts by county
+lim ##Limenitis sighting counts by county 
+pol ## Polyxenes sighting counts by county 
+gla ## Glaucus sighting counts by county 
+dia ## Diana sighting counts by county 
+tro ## Troilus sighting counts by county 
 
+abundance_and_area ## Sighting counts and land area (km^2) & summed species density for each county 
+absolute_abundance ## Sighting counts divided by land area: standardized sightings/ km^2
+relative_abundance ## proportion (percent) of sightings in each county that represent each species & species richness and species density in each county
+```
 
 NEXT STEPS: 
 # Now figure out how to analyze statistically! 
