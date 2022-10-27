@@ -2,7 +2,9 @@
 title: "BAMONA_Final_Code"
 author: "Abby Robinson and Jess Herrmann"
 date: "7/12/2022"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 Load Package Libraries
 ```{r}
@@ -903,7 +905,6 @@ all.data
 ```{r}
 library("rstudioapi")
 library("ggmap")
-register_google(key = "AIzaSyC9inTkefV2ApM_f363LUmxIRRbEAdZkVw")
 ```
 
 [6] Generate heat maps for all species
