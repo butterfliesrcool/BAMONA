@@ -29,7 +29,7 @@ battus <- read.csv(b, header = TRUE, sep = ",")
 head(battus)
 
 length(battus$id) ### Sample size: 34,893
-b <- subset(iNat.battus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
+b <- subset(battus, select = c(id, observed_on, latitude, longitude, place_county_name, place_state_name, scientific_name) )
 head(b)
 battus <- na.omit(b)
 length(battus$id) ### New sample size: 34,795
@@ -285,7 +285,7 @@ sums <- subset(abundance_and_area, select = -c(Location, area_2010_square_km) )
 density <- rowSums(sums)
 
 abundance_and_area$Species.Density <- density
-abundance_and_area
+head(abundance_and_area)
 ```
 
 
@@ -356,20 +356,20 @@ head(relative_abundance) ## comparing 2,232 counties in the United States
 ```{r}
 relative_abundance$Species.Density <- density
 relative_abundance <- relative_abundance[order(relative_abundance$Species.Density,decreasing=T),]
-relative_abundance
+head(relative_abundance)
 ```
 Data Summary:
 ```{r}
-bat ## Battus sighting counts by county
-lim ##Limenitis sighting counts by county 
-pol ## Polyxenes sighting counts by county 
-gla ## Glaucus sighting counts by county 
-dia ## Diana sighting counts by county 
-tro ## Troilus sighting counts by county 
+head(bat) ## Battus sighting counts by county
+head(lim) ##Limenitis sighting counts by county 
+head(pol) ## Polyxenes sighting counts by county 
+head(gla) ## Glaucus sighting counts by county 
+head(dia) ## Diana sighting counts by county 
+head(tro) ## Troilus sighting counts by county 
 
-abundance_and_area ## Sighting counts and land area (km^2) & summed species density for each county 
-absolute_abundance ## Sighting counts divided by land area: standardized sightings/ km^2
-relative_abundance ## proportion (percent) of sightings in each county that represent each species & species richness and species density in each county
+head(abundance_and_area) ## Sighting counts and land area (km^2) & summed species density for each county 
+head(absolute_abundance) ## Sighting counts divided by land area: standardized sightings/ km^2
+head(relative_abundance) ## proportion (percent) of sightings in each county that represent each species & species richness and species density in each county
 ```
 
 NEXT STEPS: 
