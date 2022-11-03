@@ -995,7 +995,7 @@ diana_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 
   stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
                  alpha = .2,
                  bins = 15, data = diana, geom = "polygon") +
-  labs(fill="B. philenor
+  labs(fill="S. diana
 Population Density") +
   scale_fill_viridis_c(option = "plasma")
 
