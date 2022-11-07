@@ -20,7 +20,7 @@ library(ggmap)
 
 Linking in API key
 ```{r}
-register_google(key = "AIzaSyAYvftG7uvL7-jVqHKLG0fVN14AFcY8Q0k")
+register_google(key = "")
 ```
 
 A function that can be called to load and clean each data set
