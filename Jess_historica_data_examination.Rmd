@@ -1,0 +1,68 @@
+---
+title: "Jess_historical_data_examination"
+author: "Jessica Herrmann"
+date: "2022-11-09"
+output: html_document
+---
+
+[1] Load Package Libraries
+```{r}
+library(curl)
+library(ggplot2)
+library(MASS)
+library(curl)
+library(raster)
+library(spatialEco)
+library(lubridate)
+library(rstudioapi)
+library(ggmap)
+```
+
+Linking in API key
+```{r}
+register_google(key = "") #insert API key here
+```
+
+A function that can be called to load and clean each data set
+```{r}
+load_data <- function(url){
+  
+  d <- curl(url)
+  d.csv <- read.csv(d, header = TRUE, sep = ",")
+  
+  d.clean <- na.omit(d.csv)
+  d.clean <- subset(d.clean, select = -c(Organism.Type,Location.Notes, Observation.Notes, Updated.Date, Partner.Project, Data.Source, Submitter ) )
+  d.clean <- subset(d.clean, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+  
+  return(d.clean)
+  
+}
+```
+
+Loading/cleaning the data for each species
+```{r}
+bphi <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+last <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+ppol <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+ptro <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+pgla_0 <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+
+# Have to modify it a little for the S. diana data set:
+sdia_0 <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+sdia_0 <- read.csv(sdia_0, header = TRUE, sep = ",")
+sdia_0 <- na.omit(sdia_0)
+sdia_0 <- subset(sdia_0, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+```
+
+Additional cleaning for P. glaucus and S. diana data
+```{r}
+## P. glaucus:
+pgla <- subset(pgla_0, Sex == "BF", drop = FALSE)
+length(pgla$Record.Number)
+pgla
+
+## S. diana:
+sdia <- subset(sdia_0, sex == "F", drop = FALSE)
+length(sdia$Record.Number)
+sdia
+```

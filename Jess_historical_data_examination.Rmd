@@ -1,0 +1,98 @@
+---
+title: "Jess_historical_data_examination"
+author: "Jessica Herrmann"
+date: "2022-11-09"
+output: html_document
+---
+
+[1] Load Package Libraries
+```{r}
+library(curl)
+library(ggplot2)
+library(MASS)
+library(curl)
+library(raster)
+library(spatialEco)
+library(lubridate)
+library(rstudioapi)
+library(ggmap)
+```
+
+Linking in API key
+```{r}
+register_google(key = "") #insert API key here
+```
+
+This is my same cleaning function, but here I am including "Location.Notes", "Observation.Notes", "Updated.Date", "Partner.Project", and "Data.Source". I am specifically interested in figuring out why the historical data from 1889-1999 is centered in NY.
+```{r}
+load_data <- function(url){
+  
+  d <- curl(url)
+  d.csv <- read.csv(d, header = TRUE, sep = ",")
+  
+  d.clean <- na.omit(d.csv)
+  d.clean <- subset(d.clean, select = -c(Organism.Type, Submitter ) )
+  #d.clean <- subset(d.clean, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+  
+  return(d.clean)
+  
+}
+```
+
+Loading/cleaning the data for each species
+```{r}
+bphi <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/battus_philenor.csv")
+last <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/limenitis_arthemis_astyanax.csv")
+ppol <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_polyxenes.csv")
+ptro <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_troilus.csv")
+pgla_0 <- load_data("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/papilio_glaucus.csv")
+
+# Have to modify it a little for the S. diana data set:
+sdia_0 <- curl("https://raw.githubusercontent.com/butterfliesrcool/BAMONA/main/speyeria.diana.csv")
+sdia_0 <- read.csv(sdia_0, header = TRUE, sep = ",")
+sdia_0 <- na.omit(sdia_0)
+sdia_0 <- subset(sdia_0, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+```
+
+Additional cleaning for P. glaucus and S. diana data
+```{r}
+## P. glaucus:
+pgla <- subset(pgla_0, Sex == "BF", drop = FALSE)
+length(pgla$Record.Number)
+pgla
+
+## S. diana:
+sdia <- subset(sdia_0, sex == "F", drop = FALSE)
+length(sdia$Record.Number)
+sdia
+```
+
+Use the lubridate() package to separate data by yearly increments
+```{r}
+bphi
+bphi.dates <- parse_date_time(bphi$Observation.Date, "mdy")
+bphi.years <- year(bphi.dates) # year() fxn creates separate column for years
+bphi$years <- bphi.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+bphi <- bphi[order(bphi$years,decreasing=F),]
+bphi
+```
+
+```{r}
+# shows first and last six data points
+head(bphi)
+tail(bphi)
+
+# increases the max.print so we can see all data (otherwise R cuts it off at the first 1000 data points)
+options(max.print=1000000)
+bphi$years
+```
+
+Seeing how much the data set grew when I include all categories under "Specimen.Type"
+```{r}
+bphi.1889_1999 <- subset(bphi, years %in% c("1889", "1890", "1891", "1892", "1893", "1894", "1895", "1896", "1897", "1898", "1899", "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910","1911", "1912", "1913", "1914", "1915", "1916", "1917","1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970","1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980","1981", "1982", "1933", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999"), drop = FALSE)
+length(bphi.1889_1999$Record.Number)
+
+## n = 59 So the data only increased by one point (was 58 when only including "Specimen" and "Photograph")
+```
