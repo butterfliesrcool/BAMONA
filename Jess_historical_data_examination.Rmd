@@ -32,7 +32,7 @@ load_data <- function(url){
   
   d.clean <- na.omit(d.csv)
   d.clean <- subset(d.clean, select = -c(Organism.Type, Submitter ) )
-  #d.clean <- subset(d.clean, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
+  d.clean <- subset(d.clean, Specimen.Type %in% c("Specimen", "Photograph"), drop = FALSE)
   
   return(d.clean)
   
@@ -89,10 +89,89 @@ options(max.print=1000000)
 bphi$years
 ```
 
-Seeing how much the data set grew when I include all categories under "Specimen.Type"
 ```{r}
 bphi.1889_1999 <- subset(bphi, years %in% c("1889", "1890", "1891", "1892", "1893", "1894", "1895", "1896", "1897", "1898", "1899", "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910","1911", "1912", "1913", "1914", "1915", "1916", "1917","1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970","1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980","1981", "1982", "1933", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999"), drop = FALSE)
 length(bphi.1889_1999$Record.Number)
 
-## n = 59 So the data only increased by one point (was 58 when only including "Specimen" and "Photograph")
+## n = 58
+```
+
+I'll look at the Limenitis data as well to see if there are similar trends.
+Use the lubridate() package to separate data by yearly increments
+```{r}
+last
+last.dates <- parse_date_time(last$Observation.Date, "mdy")
+last.years <- year(last.dates) # year() fxn creates separate column for years
+last$years <- last.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+last <- last[order(last$years,decreasing=F),]
+last
+```
+
+```{r}
+# shows first and last six data points
+head(last)
+tail(last)
+
+# increases the max.print so we can see all data (otherwise R cuts it off at the first 1000 data points)
+options(max.print=1000000)
+last$years
+```
+
+```{r}
+last.1889_1999 <- subset(last, years %in% c("1889", "1890", "1891", "1892", "1893", "1894", "1895", "1896", "1897", "1898", "1899", "1900", "1901", "1902", "1903", "1904", "1905", "1906", "1907", "1908", "1909", "1910","1911", "1912", "1913", "1914", "1915", "1916", "1917","1918", "1919", "1920", "1921", "1922", "1923", "1924", "1925", "1926", "1927", "1928", "1929", "1930", "1931", "1932", "1933", "1934", "1935", "1936", "1937", "1938", "1939", "1940", "1941", "1942", "1943", "1944", "1945", "1946", "1947", "1948", "1949", "1950", "1951", "1952", "1953", "1954", "1955", "1956", "1957", "1958", "1959", "1960", "1961", "1962", "1963", "1964", "1965", "1966", "1967", "1968", "1969", "1970","1971", "1972", "1973", "1974", "1975", "1976", "1977", "1978", "1979", "1980","1981", "1982", "1933", "1984", "1985", "1986", "1987", "1988", "1989", "1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999"), drop = FALSE)
+length(last.1889_1999$Record.Number)
+
+## n = 6
+```
+
+For P. polyxenes
+```{r}
+ppol
+ppol.dates <- parse_date_time(ppol$Observation.Date, "mdy")
+ppol.years <- year(ppol.dates) # year() fxn creates separate column for years
+ppol$years <- ppol.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+ppol <- ppol[order(ppol$years,decreasing=F),]
+ppol
+
+## n = 150
+```
+
+For P. troilus... why does it say Limenitis???
+```{r}
+ptro
+ptro.dates <- parse_date_time(ptro$Observation.Date, "mdy")
+ptro.years <- year(ptro.dates) # year() fxn creates separate column for years
+ptro$years <- ptro.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+ptro <- ptro[order(ptro$years,decreasing=F),]
+ptro
+```
+
+```{r}
+pgla
+pgla.dates <- parse_date_time(pgla$Observation.Date, "mdy")
+pgla.years <- year(pgla.dates) # year() fxn creates separate column for years
+pgla$years <- pgla.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+pgla <- pgla[order(pgla$years,decreasing=F),]
+pgla
+```
+
+
+For S. diana - not sure why this cell won't run
+```{r}
+sdia
+sdia.dates <- parse_date_time(sdia$Observation.Date, "mdy")
+sdia.years <- year(sdia.dates) # year() fxn creates separate column for years
+sdia$years <- sdia.years # adds "years" column back into data set
+
+# orders data set by "years" decreasing (most recent last)
+sdia <- sdia[order(sdia$years,decreasing=F),]
+sdia
 ```

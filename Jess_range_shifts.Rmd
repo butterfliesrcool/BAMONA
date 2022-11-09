@@ -175,11 +175,14 @@ length(bphi.2020_2021$Record.Number)
 
 # So far what I'm seeing is that, pre-2010, there was not a lot of data. And the collection times were kind of sporadic (i.e. some years there was no data, then in other years/decades, there was more data collected.) I think it makes sense to look closely at the 2010-2021 time frame for starters.
 
-# For simplicity, here are the two decades together:
 
-bphi.2000_2021 <- subset(bphi, years %in% c("2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010","2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021"), drop = FALSE)
-length(bphi.2000_2021$Record.Number)
-## n = 1224
+bphi.2000_2010 <- subset(bphi, years %in% c("2000","2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010"), drop = FALSE)
+length(bphi.2000_2010$Record.Number)
+## n = 122
+
+bphi.2011_2021 <- subset(bphi, years %in% c("2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021"), drop = FALSE)
+length(bphi.2011_2021$Record.Number)
+## n = 1102
 ```
 
 Generate a heat map for Battus, 1889 - 1969 data
@@ -328,7 +331,7 @@ bphi.2020_2021_heatmap <- ggmap(get_googlemap(center = c(lon = -79.7465848080577
 bphi.2020_2021_heatmap
 ```
 
-2000 - 2021 Battus data heat map
+
 ```{r}
 bphi.2000_2021_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
                                   zoom = 4,scale = 2,
@@ -341,6 +344,52 @@ bphi.2000_2021_heatmap <- ggmap(get_googlemap(center = c(lon = -79.7465848080577
   scale_fill_viridis_c(option = "plasma")
 
 bphi.2000_2021_heatmap
+```
+*** Dividing the data into three subsets by year: 1869-1999, 2000-2010, and 2011-2021 ***
+
+1889 - 1999 Battus data heat map (n=58)
+```{r}
+bphi.1889_1999_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = bphi.1889_1999, geom = "polygon") +
+  labs(fill="B. philenor Population Density, 1889 - 1999") +
+  scale_fill_viridis_c(option = "plasma")
+
+bphi.1889_1999_heatmap
+```
+
+2000 - 2021 Battus data heat map (n=122)
+```{r}
+bphi.2000_2010_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = bphi.2000_2010, geom = "polygon") +
+  labs(fill="B. philenor Population Density, 2000 - 2010") +
+  scale_fill_viridis_c(option = "plasma")
+
+bphi.2000_2010_heatmap
+```
+
+2011 - 2021 Battus data heat map (n=1102). It appears that the range has shifted northward... However, it's important to note that this subset has significantly more data points than the 2000-2010 subset, and this likely impacts the resolution.
+```{r}
+bphi.2011_2021_heatmap <- ggmap(get_googlemap(center = c(lon = -79.74658480805773, lat = 37.20888926712938),
+                                  zoom = 4,scale = 2,
+                                  maptype = 'terrain',
+                                  color = 'color'))+
+  stat_density2d(aes(x = Longitude, y = Lat.Long, fill = ..level..),
+                 alpha = .2,
+                 bins = 15, data = bphi.2011_2021, geom = "polygon") +
+  labs(fill="B. philenor Population Density, 2011 - 2021") +
+  scale_fill_viridis_c(option = "plasma")
+
+bphi.2011_2021_heatmap
 ```
 
 
