@@ -1,0 +1,100 @@
+---
+title: "NABA"
+author: "Abby Robinson"
+date: "12/16/2022"
+output: html_document
+---
+Project Summary: 
+compare changes in the dates of first occurance and peak abundance in limenitis arthemis astyanx and battus philenor over time and geographically as you move away from the heart of battus's range. we'd expect closely linked phenology in the heart of the range but this should break down, and we might see more variable phenology, in areas where battus is rare 
+
+Notes: 
+can I quantify the coordinate points of the center of the model's range in a more robust/ explicit way ? 
+
+Packages 
+```{r}
+library(curl)
+library(lubridate)
+library(geosphere)
+library(ggplot2)
+library(lme4)
+```
+
+
+```{r}
+setwd("/Users/abbyrobinson/Desktop")
+NABA <- read.csv(file = 'NABA.csv')
+head(NABA)
+```
+
+```{r}
+rsp <- subset(NABA, ScientificName == "Limenitis arthemis astyanax")
+```
+
+```{r}
+dates <- parse_date_time(rsp$Date, "mdy")
+months <- months(dates)
+days <- day(dates)
+year <- year(dates)
+
+days_since_Jan1 <- yday(dates) - 1 # so Jan 1 = day 0 
+rsp$days_since_Jan1 <- days_since_Jan1
+
+rsp$month_day <- paste(months, days, sep = " ")
+rsp$year <- year
+rsp
+```
+Heart of Battus's Range: 35.973224, -84.445609
+
+```{r}
+# calculate distance from the heart of the range 
+# https://www.rdocumentation.org/packages/geosphere/versions/1.5-18/topics/distm
+# distGeo: Highly accurate estimate of the shortest distance between two points on an ellipsoid (default is WGS84 ellipsoid)
+
+coordinates <- subset(rsp, select = c(Lng, Lat) )
+coordinates <- as.matrix(coordinates)
+heart <- c(-84.445609, 35.973224)
+dist_mat <- distm(coordinates, heart,  fun = distGeo)  # Apply distm function
+Distance <- as.vector(dist_mat)  
+rsp$Distance <- Distance
+head(rsp)
+```
+```{r}
+year2018 <- subset(rsp, year == "2018")
+b <- ggplot(year2018, aes(x=month_day, y=NumSeen)) + 
+  geom_bar(stat="identity", color="black",fill="grey")
+
+rsp[order(rsp$NumSeen,decreasing=T),]
+```
+
+Notes for GLMM: 
+the interaction between the number of butterflies seen (NumSeen) and date (month_day) varies by location (distance from the heart of Battus's range), the year, and the interaction between the two with parties and party hours as random effects 
+
+does the date that we see peak abundance in limenitis arthemis astyanax vary significantly with distance from the heart of the model's range and has this pattern changed over time? 
+
+```{r}
+is.integer(rsp$year)
+rsp$year <- as.integer(rsp$year)
+is.integer(rsp$year)
+
+rsp.ord <- rsp[order(rsp$year, decreasing = FALSE),]
+barplot(height=rsp.ord$NumSeen, names=rsp.ord$year)
+
+rsp.ord2 <- rsp[order(rsp$days_since_Jan1, decreasing = FALSE),]
+head(rsp.ord2)
+tail(rsp.ord2)
+barplot(height=rsp.ord2$NumSeen, names=rsp.ord$days_since_Jan1)
+
+# for each year and each distance from the heart of the range, does the date of peak abunance change 
+# for each survey location and year, what is the date of peak abundance 
+mod1 <- glmer(NumSeen ~ month_day + (1|Parties) + (1|Party_Hours),  data =  rsp, family = poisson)
+summary(mod1)
+```
+```{r}
+year2018 <- subset(rsp, year == "2018")
+unique(year2018$CountName)
+
+patagonia2018 <- subset(year2018, CountName == "Patagonia, AZ.") # only one sighting in each location each year. 
+```
+We can't do a phenology analysis if there is only one survey per location per year... What are our other options? 
+
+
